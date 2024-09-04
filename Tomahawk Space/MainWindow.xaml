@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Tomahawk_Space"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Tomahawk Space" Height="450" Width="800"
+        WindowStyle="None" ResizeMode="CanResize">
 
+    <WindowChrome.WindowChrome>
+        <WindowChrome CornerRadius="1" GlassFrameThickness="1" ResizeBorderThickness="1" CaptionHeight="1"/>
+    </WindowChrome.WindowChrome>
+    
+    <!-- Главная панель -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <!-- Навигационная панель -->
+        <DockPanel Grid.Row="0" Name="Titlebar" Background="#222" LastChildFill="False" MouseDown="Titlebar_MouseDown">
+            <Button Name="Close" Click="Close_Click" Width="50" DockPanel.Dock="Right"></Button>
+            <Button Name="MinMax" Click="MinMax_Click" Width="50" DockPanel.Dock="Right"></Button>
+            <Button Name="Minimize" Click="Minimize_Click" Width="50" DockPanel.Dock="Right"></Button>
+        </DockPanel>
     </Grid>
 </Window>
