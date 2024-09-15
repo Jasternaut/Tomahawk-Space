@@ -21,8 +21,8 @@
         
         <!-- Навигационная панель -->
         <DockPanel Grid.Row="0" Name="Titlebar" Background="#222" LastChildFill="False" MouseDown="Titlebar_MouseDown">
-            <Image Margin="10 0 0 0" DockPanel.Dock="Left" Source="/Resources/Logo.png"></Image>
-            
+            <Image Margin="10 0 0 0" DockPanel.Dock="Left" Source="/Resources/Logo.png"/>
+
             <Grid Name="Close" MouseDown="Close_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}">
                 <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/Close.png"/>
             </Grid>
