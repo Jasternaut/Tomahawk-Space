@@ -21,9 +21,9 @@
         
         <!-- Навигационная панель -->
         <DockPanel Grid.Row="0" Name="Titlebar" Background="#222" LastChildFill="False" MouseDown="Titlebar_MouseDown">
-            <Button Name="Close" Click="Close_Click" Width="50" DockPanel.Dock="Right"></Button>
-            <Button Name="MinMax" Click="MinMax_Click" Width="50" DockPanel.Dock="Right"></Button>
-            <Button Name="Minimize" Click="Minimize_Click" Width="50" DockPanel.Dock="Right"></Button>
+            <Button Name="Close" Click="Close_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
+            <Button Name="MinMax" Click="MinMax_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
+            <Button Name="Minimize" Click="Minimize_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
         </DockPanel>
     </Grid>
 </Window>
