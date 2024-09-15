@@ -48,5 +48,10 @@ namespace Tomahawk_Space
             if (this.WindowState == WindowState.Maximized | this.WindowState == WindowState.Normal)
                 this.WindowState = WindowState.Minimized;
         }
+
+        private void ShowButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

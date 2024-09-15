@@ -13,7 +13,7 @@
     </WindowChrome.WindowChrome>
     
     <!-- Главная панель -->
-    <Grid>
+    <Grid Background="#111">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
@@ -21,6 +21,8 @@
         
         <!-- Навигационная панель -->
         <DockPanel Grid.Row="0" Name="Titlebar" Background="#222" LastChildFill="False" MouseDown="Titlebar_MouseDown">
+            <Image Margin="10 0 0 0" DockPanel.Dock="Left" Source="/Resources/Logo.png"></Image>
+            
             <Grid Name="Close" MouseDown="Close_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}">
                 <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/Close.png"/>
             </Grid>
@@ -31,5 +33,19 @@
                 <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/Minimize.png"/>
             </Grid>
         </DockPanel>
+
+        <!-- Зона основного контента -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Border CornerRadius="10" Background="#222" Margin="10" Grid.Column="0">
+                <DockPanel Margin="10" LastChildFill="False">
+                    <Button Name="ShowButton" Click="ShowButton_Click" BorderBrush="Black" DockPanel.Dock="Bottom" Height="50" Content="Показать" Style="{StaticResource ShowButtonS}"></Button>
+                </DockPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
