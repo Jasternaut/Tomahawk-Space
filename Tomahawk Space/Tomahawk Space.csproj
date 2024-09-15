@@ -7,10 +7,45 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Moon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Close.png" />
+    <None Remove="Resources\Minimize.png" />
+    <None Remove="Resources\MinMax.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Moon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\MinMax.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Core\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Close.png" />
+    <Resource Include="Resources\Minimize.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

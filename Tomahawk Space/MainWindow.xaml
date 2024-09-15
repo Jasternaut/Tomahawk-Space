@@ -9,7 +9,7 @@
         WindowStyle="None" ResizeMode="CanResize">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CornerRadius="1" GlassFrameThickness="1" ResizeBorderThickness="1" CaptionHeight="1"/>
+        <WindowChrome CornerRadius="1" GlassFrameThickness="1" ResizeBorderThickness="1" CaptionHeight="5"/>
     </WindowChrome.WindowChrome>
     
     <!-- Главная панель -->
@@ -21,9 +21,15 @@
         
         <!-- Навигационная панель -->
         <DockPanel Grid.Row="0" Name="Titlebar" Background="#222" LastChildFill="False" MouseDown="Titlebar_MouseDown">
-            <Button Name="Close" Click="Close_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
-            <Button Name="MinMax" Click="MinMax_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
-            <Button Name="Minimize" Click="Minimize_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}"></Button>
+            <Grid Name="Close" MouseDown="Close_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}">
+                <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/Close.png"/>
+            </Grid>
+            <Grid Name="MinMax" MouseDown="MinMax_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}">
+                <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/MinMax.png"/>
+            </Grid>
+            <Grid Name="Minimize" MouseDown="Minimize_Click" Width="50" DockPanel.Dock="Right" Style="{DynamicResource NavButton}">
+                <Image Width="20" Height="20" Stretch="UniformToFill" Source="/Resources/Minimize.png"/>
+            </Grid>
         </DockPanel>
     </Grid>
 </Window>
