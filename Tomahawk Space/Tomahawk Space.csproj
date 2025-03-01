@@ -7,32 +7,31 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>Moon.ico</ApplicationIcon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Close.png" />
-    <None Remove="Resources\Logo.png" />
-    <None Remove="Resources\Minimize.png" />
-    <None Remove="Resources\MinMax.png" />
+    <Compile Remove="Core\**" />
+    <EmbeddedResource Remove="Core\**" />
+    <None Remove="Core\**" />
+    <Page Remove="Core\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Moon.ico" />
+    <None Remove="Logo.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Logo.png" />
-    <Resource Include="Resources\MinMax.png" />
+    <Content Include="Icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\" />
+    <Folder Include="Resources\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Close.png" />
-    <Resource Include="Resources\Minimize.png" />
+    <PackageReference Include="SharpVectors" Version="1.8.4.2" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
   </ItemGroup>
 
   <ItemGroup>

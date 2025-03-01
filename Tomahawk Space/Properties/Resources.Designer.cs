@@ -63,16 +63,6 @@ namespace Tomahawk_Space.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Byte[].
         /// </summary>
-        internal static byte[] Close {
-            get {
-                object obj = ResourceManager.GetObject("Close", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
-        /// </summary>
         internal static byte[] Logo {
             get {
                 object obj = ResourceManager.GetObject("Logo", resourceCulture);
@@ -81,22 +71,20 @@ namespace Tomahawk_Space.Properties {
         }
         
         /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
+        ///   Ищет локализованную строку, похожую на &amp;#xE922;.
         /// </summary>
-        internal static byte[] Minimize {
+        internal static string Maximize_Window {
             get {
-                object obj = ResourceManager.GetObject("Minimize", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("Maximize_Window", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Поиск локализованного ресурса типа System.Byte[].
+        ///   Ищет локализованную строку, похожую на &amp;#xE923;.
         /// </summary>
-        internal static byte[] MinMax {
+        internal static string Minimize_Window {
             get {
-                object obj = ResourceManager.GetObject("MinMax", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("Minimize_Window", resourceCulture);
             }
         }
     }
