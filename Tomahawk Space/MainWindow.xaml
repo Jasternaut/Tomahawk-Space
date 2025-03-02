@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Tomahawk_Space"
         mc:Ignorable="d"
         Title="Tomahawk Space" 
+        MinHeight="400" MinWidth="750"
         Height="450" Width="800" WindowStyle="None">
 
     <Window.Style>
@@ -63,5 +64,42 @@
                     FontFamily="Segoe MDL2 Assets" Content="&#xE921;" Foreground="White"
                     Click="MinimizeButton_Click"></Button>
         </DockPanel>
+
+        <!-- основной контент -->
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            
+            <!-- зона навигации и управления -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                
+                <!-- кнопки навигации -->
+                <DockPanel LastChildFill="False" Grid.Column="0" Background="#191919">
+                    <Button Name="HomeButton" Click="HomeButton_Click" DockPanel.Dock="Top" Height="40" Width="40" Margin="0,5,0,0" Style="{StaticResource RoundedButton}"
+                            FontFamily="Segoe MDL2 Assets" FontSize="20" Content="&#xE80F;" Foreground="White"></Button>
+                    <Button Name="LikedButton" Click="LikedButton_Click" DockPanel.Dock="Top" Height="40" Width="40" Margin="0,5,0,0" Style="{StaticResource RoundedButton}"
+                            FontFamily="Segoe MDL2 Assets" FontSize="20" Content="&#xEB51;" Foreground="White"></Button>
+                    <Button Name="SettingsButton" Click="SettingsButton_Click" DockPanel.Dock="Bottom" Height="40" Width="40" Margin="0,0,0,5" Style="{StaticResource RoundedButton}" 
+                            FontFamily="Segoe MDL2 Assets" FontSize="20" Content="&#xE713;" Foreground="White"></Button>
+                </DockPanel>
+                
+                <!-- кнопки управления -->
+                <Frame Name="NavFrame" Grid.Column="1" Background="#222" NavigationUIVisibility="Hidden" Source="/Nav/Home.xaml">
+                    
+                </Frame>
+            </Grid>
+            
+            <!-- зона просмотра -->
+            <Frame Name="ViewFrame" Grid.Column="2" Background="#222">
+                
+            </Frame>
+        </Grid>
     </Grid>
 </Window>

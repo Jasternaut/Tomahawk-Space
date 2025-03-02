@@ -96,5 +96,20 @@ namespace Tomahawk_Space
                     break;
             }
         }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LikedButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

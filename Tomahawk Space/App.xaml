@@ -26,21 +26,21 @@
             </Setter>
         </Style>
 
-        <Style TargetType="Button" x:Key="ShowButtonS">
+        <Style TargetType="Button" x:Key="RoundedButton">
             <Setter Property="OverridesDefaultStyle" Value="True"></Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" BorderThickness="2" CornerRadius="8">
+                        <Border Background="{TemplateBinding Background}" BorderThickness="0" CornerRadius="5">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"></ContentPresenter>
                         </Border>
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="White"></Setter>
+                                <Setter Property="Background" Value="#333"></Setter>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="False">
-                                <Setter Property="Background" Value="#999999"></Setter>
+                                <Setter Property="Background" Value="#111"></Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
