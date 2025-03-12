@@ -26,11 +26,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="View\" />
     <Folder Include="Resources\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-preview.1.25080.5" />
     <PackageReference Include="SharpVectors" Version="1.8.4.2" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
   </ItemGroup>

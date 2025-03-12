@@ -1,15 +1,6 @@
-﻿using System.Resources;
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Tomahawk_Space.Properties;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Tomahawk_Space
 {
@@ -18,14 +9,16 @@ namespace Tomahawk_Space
     /// </summary>
     public partial class MainWindow : Window
     {
-        string maximize = "\uE922";
-        string restore = "\uE923";
-        bool is_maximized = false;
+        //Core AppCore = new Core();
+        private const string Maximize = "\uE922";
+        private const string Restore = "\uE923";
+        private bool _isMaximized = true;
+        private bool _isDragMove = false;
 
-        double w_height {  get; set; }
-        double w_width {  get; set; }
-        double w_top {  get; set; }
-        double w_left {  get; set; }
+        private double WHeight {  get; set; }
+        private double WWidth {  get; set; }
+        private double WTop {  get; set; }
+        private double WLeft {  get; set; }
 
         public MainWindow()
         {
@@ -36,8 +29,18 @@ namespace Tomahawk_Space
         // Перемещение окна мышкой, зажав ЛКМ на Titlebar.
         private void Titlebar_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left) 
-                this.DragMove();
+            if (e.ChangedButton == MouseButton.Left && _isMaximized == false)
+            {
+                _isMaximized = true;
+                _isDragMove = true;
+                UpdateWindowState();
+                DragMove();
+                _isDragMove = false;
+            }
+            else if (e.ChangedButton == MouseButton.Left && _isMaximized == true)
+            {
+                DragMove();
+            }
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -45,19 +48,11 @@ namespace Tomahawk_Space
             Environment.Exit(0);
         }
 
-        void UpdateWindowData(double width, double height, double top, double left)
+        private void UpdateWindowState()
         {
-            w_height = height;
-            w_width = width;
-            w_top = top;
-            w_left = left;
-        }
+            var screen = SystemParameters.WorkArea;
 
-        private void MinMaxButton_Click(object sender, RoutedEventArgs e)
-        {
-            var screen = System.Windows.SystemParameters.WorkArea;
-
-            switch (is_maximized)
+            switch (_isMaximized)
             {
                 case false:
                     UpdateWindowData(this.Width, this.Height, this.Top, this.Left);
@@ -66,40 +61,58 @@ namespace Tomahawk_Space
                     this.Left = screen.Left;
                     this.Width = screen.Width;
                     this.Height = screen.Height;
+                    this.ResizeMode = ResizeMode.NoResize;
                     MinMaxButton.Content = "";
-                    MinMaxButton.Content = restore;
-                    is_maximized = true;
+                    MinMaxButton.Content = Restore;
+                    
                     break;
                 case true:
-                    this.Top = w_top;
-                    this.Left = w_left;
-                    this.Width = w_width;
-                    this.Height = w_height;
+                    if (!_isDragMove)
+                    {
+                        this.Top = WTop;
+                        this.Left = WLeft;
+                    }
+                    this.Width = WWidth;
+                    this.Height = WHeight;
+                    this.ResizeMode = ResizeMode.CanResize;
                     MinMaxButton.Content = "";
-                    MinMaxButton.Content = maximize;
-                    is_maximized = false;
+                    MinMaxButton.Content = Maximize;
+                    
                     break;
             }
+        }
+        
+        private void UpdateWindowData(double width, double height, double top, double left)
+        {
+            WHeight = height;
+            WWidth = width;
+            WTop = top;
+            WLeft = left;
+        }
+
+        private void MinMaxButton_Click(object sender, RoutedEventArgs e)
+        {
+            _isMaximized = !_isMaximized;
+            UpdateWindowState();
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
-            
-            
-            switch (this.WindowState)
+            this.WindowState = this.WindowState switch
             {
-                case WindowState.Normal:
-                    this.WindowState = WindowState.Minimized;
-                    break;
-                case WindowState.Maximized:
-                    this.WindowState = WindowState.Minimized;
-                    break;
-            }
+                WindowState.Normal => WindowState.Minimized,
+                WindowState.Maximized => WindowState.Minimized,
+                _ => this.WindowState
+            };
         }
-
+        
+        // NavFrame - панель управления
+        // ViewFrame - для показа
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var appCore = App.Services.GetRequiredService<Core>();
+            NavFrame.Navigate(appCore.GetHome());
+            ViewFrame.Navigate(appCore.GetLoader());
         }
 
         private void LikedButton_Click(object sender, RoutedEventArgs e)

@@ -13,12 +13,14 @@
                VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White"></Label>
         <Border DockPanel.Dock="Top" Height="40" Background="#111" CornerRadius="5" Margin="5,0,5,0">
             <DockPanel LastChildFill="False">
-                <CheckBox DockPanel.Dock="Left" Height="30" Width="30" Margin="5,0,0,0" Background="#222"></CheckBox>
-                <TextBlock DockPanel.Dock="Right" FontSize="14" Foreground="White" Text="Использовать продвинутый режим" TextWrapping="Wrap" Margin="0,0,10,0"></TextBlock>
+                <CheckBox Name="UseAdvanced" Checked="UseAdvanced_OnChecked" Unchecked="UseAdvanced_OnUnchecked" DockPanel.Dock="Left" Height="30" Width="30" Margin="5,0,0,0" 
+                          Background="#222" Style="{StaticResource CircleCheckbox}"></CheckBox>
+                <TextBlock DockPanel.Dock="Right" FontSize="14" Foreground="White" Text="Использовать продвинутый режим" 
+                           TextWrapping="Wrap" Margin="0,0,10,0"></TextBlock>
             </DockPanel>
         </Border>
 
-        <Border DockPanel.Dock="Top" Height="120" Margin="5,45,5,0" Background="#111" CornerRadius="5">
+        <Border Name="AdvancedPanel" DockPanel.Dock="Top" Height="120" Margin="5,45,5,0" Background="#111" CornerRadius="5">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"></RowDefinition>
@@ -28,7 +30,7 @@
 
                 <DockPanel Grid.Row="0" LastChildFill="False">
                     <TextBox BorderThickness="0" Background="#222" DockPanel.Dock="Left" Margin="5,0,0,0" 
-                             Height="30" Width="60" Name="TextBox_Day" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
+                             Height="30" Width="60" Name="TextBoxDay" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
                              HorizontalContentAlignment="Center" MaxLength="2" Foreground="White" FontWeight="Bold">
                         <TextBox.Resources>
                             <Style TargetType="Border">
@@ -41,7 +43,7 @@
                 </DockPanel>
                 <DockPanel Grid.Row="1" LastChildFill="False">
                     <TextBox BorderThickness="0" Background="#222" DockPanel.Dock="Left" Margin="5,0,0,0" 
-                             Height="30" Width="60" Name="TextBox_Month" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
+                             Height="30" Width="60" Name="TextBoxMonth" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
                              HorizontalContentAlignment="Center" MaxLength="2" Foreground="White" FontWeight="Bold">
                         <TextBox.Resources>
                             <Style TargetType="Border">
@@ -54,7 +56,7 @@
                 </DockPanel>
                 <DockPanel Grid.Row="2" LastChildFill="False">
                     <TextBox BorderThickness="0" Background="#222" DockPanel.Dock="Left" Margin="5,0,0,0" 
-                             Height="30" Width="60" Name="TextBox_Year" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
+                             Height="30" Width="60" Name="TextBoxYear" PreviewTextInput="NumberValidationTextBox" VerticalContentAlignment="Center"
                              HorizontalContentAlignment="Center" MaxLength="4" Foreground="White" FontWeight="Bold">
                         <TextBox.Resources>
                             <Style TargetType="Border">
@@ -68,6 +70,7 @@
             </Grid>
         </Border>
 
-        <Button DockPanel.Dock="Bottom" Height="40" Style="{StaticResource RoundedButton}" FontSize="14" Foreground="White" Content="Загрузить" Margin="5,0,5,5"></Button>
+        <Button Name="LoadImage" Click="LoadImage_OnClick" DockPanel.Dock="Bottom" Height="40" Style="{StaticResource RoundedButton}" 
+                FontSize="14" Foreground="White" Content="Загрузить" Margin="5,0,5,5"></Button>
     </DockPanel>
 </Page>
