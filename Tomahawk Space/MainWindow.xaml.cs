@@ -24,6 +24,9 @@ namespace Tomahawk_Space
         {
             InitializeComponent();
             UpdateWindowData(this.Width, this.Height, this.Top, this.Left);
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
+            NavFrame.Navigate(appCore.GetHome());
+            ViewFrame.Navigate(appCore.GetLoader());
         }
 
         // Перемещение окна мышкой, зажав ЛКМ на Titlebar.
@@ -110,19 +113,21 @@ namespace Tomahawk_Space
         // ViewFrame - для показа
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            var appCore = App.Services.GetRequiredService<Core>();
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
             NavFrame.Navigate(appCore.GetHome());
             ViewFrame.Navigate(appCore.GetLoader());
         }
 
         private void LikedButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
+            NavFrame.Navigate(appCore.GetLikedNav());
+            ViewFrame.Navigate(appCore.GetLikedView());
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //var appCore = App.Services.GetRequiredService<Cores.Core>();
         }
     }
 }

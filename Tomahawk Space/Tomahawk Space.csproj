@@ -11,13 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Core\**" />
-    <EmbeddedResource Remove="Core\**" />
-    <None Remove="Core\**" />
-    <Page Remove="Core\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Logo.png" />
   </ItemGroup>
 
@@ -41,6 +34,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Cores\Core.cs" />
   </ItemGroup>
 
   <ItemGroup>

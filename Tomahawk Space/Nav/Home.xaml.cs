@@ -31,20 +31,20 @@ namespace Tomahawk_Space.Nav
 
         private void UseAdvanced_OnChecked(object sender, RoutedEventArgs e)
         {
-            var appCore = App.Services.GetRequiredService<Core>();
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
             appCore.SetAdvancedState(true);
             UpdateState();
         }
         private void UseAdvanced_OnUnchecked(object sender, RoutedEventArgs e)
         {
-            var appCore = App.Services.GetRequiredService<Core>();
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
             appCore.SetAdvancedState(false);
             UpdateState();
         }
 
         private void UpdateState()
         {
-            var appCore = App.Services.GetRequiredService<Core>();
+            var appCore = App.Services.GetRequiredService<Cores.Core>();
             AdvancedPanel.Visibility = appCore.GetAdvancedState() ? Visibility.Visible : Visibility.Hidden;
         }
     }

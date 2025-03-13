@@ -16,7 +16,7 @@ namespace Tomahawk_Space
         protected override void OnStartup(StartupEventArgs e)
         {
             var services = new ServiceCollection();
-            services.AddSingleton<Core>();
+            services.AddSingleton<Cores.Core>();
             Services = services.BuildServiceProvider();
             base.OnStartup(e);
         }
