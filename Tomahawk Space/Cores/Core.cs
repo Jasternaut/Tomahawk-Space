@@ -1,5 +1,4 @@
-﻿using Tomahawk_Space;
-using Tomahawk_Space.Nav;
+﻿using Tomahawk_Space.Nav;
 using Tomahawk_Space.View;
 
 namespace Tomahawk_Space.Cores

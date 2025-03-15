@@ -9,7 +9,7 @@ namespace Tomahawk_Space
     /// </summary>
     public partial class MainWindow : Window
     {
-        //Core AppCore = new Core();
+        Cores.Core appCore = App.Services.GetRequiredService<Cores.Core>();
         private const string Maximize = "\uE922";
         private const string Restore = "\uE923";
         private bool _isMaximized = true;
@@ -24,9 +24,9 @@ namespace Tomahawk_Space
         {
             InitializeComponent();
             UpdateWindowData(this.Width, this.Height, this.Top, this.Left);
-            var appCore = App.Services.GetRequiredService<Cores.Core>();
+            //var appCore = App.Services.GetRequiredService<Cores.Core>();
             NavFrame.Navigate(appCore.GetHome());
-            ViewFrame.Navigate(appCore.GetLoader());
+            ViewFrame.Navigate(appCore.GetLoader()); 
         }
 
         // Перемещение окна мышкой, зажав ЛКМ на Titlebar.
@@ -113,14 +113,12 @@ namespace Tomahawk_Space
         // ViewFrame - для показа
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            var appCore = App.Services.GetRequiredService<Cores.Core>();
             NavFrame.Navigate(appCore.GetHome());
             ViewFrame.Navigate(appCore.GetLoader());
         }
 
         private void LikedButton_Click(object sender, RoutedEventArgs e)
         {
-            var appCore = App.Services.GetRequiredService<Cores.Core>();
             NavFrame.Navigate(appCore.GetLikedNav());
             ViewFrame.Navigate(appCore.GetLikedView());
         }
