@@ -1,0 +1,44 @@
+name: tomahawk_space
+description: "Приложение для просмотра изображений дня от NASA"
+publish_to: 'none' # Убрать это при публикации в pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.1
+  url_launcher: ^6.2.2
+  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  cached_network_image: ^3.2.0
+  shared_preferences: ^2.0.15
+  provider: ^6.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.6
+  hive_generator: ^2.0.1
+  flutter_launcher_icons: ^0.14.3
+
+
+flutter:
+  uses-material-design: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/icon_mobile.png"
+  min_sdk_android: 21
+  windows:
+    generate: true
+    image_path: "assets/icons/icon.png"
+    icon_size: 48 # min: 48, max: 256, default: 48

@@ -1,0 +1,151 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Flutter/Dart/Pub related
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.fpackages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+*.dart.js
+*.js
+*.map
+*.mocks.dart
+coverage/
+*.packages
+*.lock
+pubspec.lock
+
+# Android related
+**/android/.gradle
+**/android/.idea
+**/android/local.properties
+**/android/key.properties
+**/android/gradlew
+**/android/gradlew.bat
+**/android/*.keystore
+**/android/*.jks
+**/android/app/build/
+**/android/app/release/
+**/android/app/debug/
+**/android/app/profile/
+*.apk
+*.aab
+*.ap_
+
+# iOS related
+**/ios/.DS_Store
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/Podfile.lock
+**/ios/Runner.xcworkspace
+**/ios/Runner/Info.plist
+**/ios/Runner.xcodeproj/project.xcworkspace
+**/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+
+# Windows related
+**/windows/.vs/
+**/windows/build/
+**/windows/vcpkg/
+**/windows/Runner.exe
+**/windows/Runner.exe.manifest
+**/windows/Runner.exp
+**/windows/Runner.lib
+**/windows/Runner.pdb
+**/windows/*.ico
+*.exe
+*.msix
+*.msi
+
+# macOS related
+.DS_Store
+**/macos/.DS_Store
+**/macos/Pods/
+**/macos/Podfile.lock
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/Flutter-Debug.xcconfig
+**/macos/Flutter/Flutter-Release.xcconfig
+
+# IDE related
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# Sensitive data
+android/app/src/main/res/values/secrets.xml
+keys.json
+.env
+*.key
+*.pem
+*.cert
+
+# Miscellaneous
+*.log
+*.swp
+*.swo
+*.bak
+*.tmp
+*.temp
+*.cache
+
+# Generated files
+generated/
+*.g.dart
+*.gen.dart
+*.freezed.dart
+*.gr.dart
+
+# Your specific sensitive files
+android/app/src/main/AndroidManifest.xml.bak
+ios/Runner/Info.plist.bak
