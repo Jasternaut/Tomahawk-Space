@@ -2,7 +2,7 @@ name: tomahawk_space
 description: "Приложение для просмотра изображений дня от NASA"
 publish_to: 'none' # Убрать это при публикации в pub.dev
 
-version: 1.0.0+1
+version: 1.1.0
 
 environment:
   sdk: ^3.8.1
@@ -32,6 +32,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/logo.png
 
 flutter_launcher_icons:
   android: "launcher_icon"

@@ -3,13 +3,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tomahawk_space/models/apod.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 Future<Apod> fetchApod({String? date}) async {
   final prefs = await SharedPreferences.getInstance();
-  final String apiKey = prefs.getString('nasa_api_key') ?? 'DEMO_KEY'; // Запасной ключ на случай ошибки
+  final String apiKey = prefs.getString('nasa_api_key') ?? 'DEMO_KEY';
   String url = 'https://api.nasa.gov/planetary/apod?api_key=$apiKey';
 
   if (date != null && date.isNotEmpty) {
@@ -34,8 +34,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Future<Apod>? futureApod;
   String? _selectedDate;
-  Apod? currentApod; // Для хранения текущего изображения
-
+  Apod? currentApod;
   bool _isDateSelectionEnabled = false;
   final TextEditingController _dateController = TextEditingController();
   final Box<Apod> favoritesBox = Hive.box<Apod>('favorites');
@@ -56,12 +55,12 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       futureApod = fetchApod(date: _selectedDate).then((apod) {
         setState(() {
-          currentApod = apod; // Обновляем currentApod после загрузки
+          currentApod = apod;
         });
         return apod;
       }).catchError((error) {
         setState(() {
-          currentApod = null; // Сбрасываем при ошибке
+          currentApod = null;
         });
         throw error;
       });
@@ -72,39 +71,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NASA APOD'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('TOMAHAWK'),
+            const SizedBox(width: 8),
+            Image.asset(
+              'assets/icons/logo.png',
+              height: 24, // Настрой размер изображения
+            ),
+          ],
+        ),
         centerTitle: true,
-        actions: [
-          if (currentApod != null)
-            IconButton(
-              icon: Icon(
-                favoritesBox.containsKey(currentApod!.date)
-                    ? Icons.favorite
-                    : Icons.favorite_border,
-              ),
-              onPressed: () async {
-                if (favoritesBox.containsKey(currentApod!.date)) {
-                  await favoritesBox.delete(currentApod!.date);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Удалено из избранного')),
-                  );
-                } else {
-                  await favoritesBox.put(currentApod!.date, currentApod!);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Добавлено в избранное')),
-                  );
-                }
-                setState(() {});
-              },
-            ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextButton(
-              onPressed: _loadApod,
-              child: const Text('Загрузить', style: TextStyle(color: Colors.grey)),
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -113,22 +91,20 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _isDateSelectionEnabled,
-                      onChanged: (bool? newValue) {
-                        setState(() {
-                          _isDateSelectionEnabled = newValue ?? false;
-                          if (!_isDateSelectionEnabled) {
-                            _selectedDate = null;
-                            _dateController.clear();
-                          }
-                        });
-                      },
-                    ),
-                    const Text('Указать конкретную дату'),
-                  ],
+                ListTile(
+                  title: const Text('Указать конкретную дату'),
+                  trailing: Switch(
+                    value: _isDateSelectionEnabled,
+                    onChanged: (bool newValue) {
+                      setState(() {
+                        _isDateSelectionEnabled = newValue;
+                        if (!_isDateSelectionEnabled) {
+                          _selectedDate = null;
+                          _dateController.clear();
+                        }
+                      });
+                    },
+                  ),
                 ),
                 if (_isDateSelectionEnabled)
                   Builder(
@@ -176,9 +152,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 future: futureApod,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Text('Ошибка: ${snapshot.error}');
+                    return Center(child: Text('Ошибка: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     final apod = snapshot.data!;
                     return SingleChildScrollView(
@@ -209,7 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                         if (await canLaunchUrl(uri)) {
                                           await launchUrl(uri);
                                         } else {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             SnackBar(
                                                 content: Text(
                                                     'Не удалось открыть ссылку: ${apod.url}')),
@@ -227,11 +204,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ],
                                 )
-                              : 
-                                CachedNetworkImage(
+                              : CachedNetworkImage(
                                   imageUrl: apod.url,
-                                  placeholder: (context, url) => const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      const Text(
+                                          'Не удалось загрузить изображение.'),
                                 ),
                           const SizedBox(height: 16),
                           Text(
@@ -252,10 +231,59 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   } else {
-                    return const Text('Нажмите кнопку "Обновить" для загрузки изображения дня.');
+                    return const Center(
+                      child:
+                          Text('Нажмите "Загрузить" для получения изображения.'),
+                    );
                   }
                 },
               ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _loadApod,
+                    child: const Text('Загрузить'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                if (currentApod != null)
+                  IconButton(
+                    icon: Icon(
+                      favoritesBox.containsKey(currentApod!.date)
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                    ),
+                    onPressed: () async {
+                      if (favoritesBox.containsKey(currentApod!.date)) {
+                        await favoritesBox.delete(currentApod!.date);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Удалено из избранного')),
+                        );
+                      } else {
+                        await favoritesBox.put(currentApod!.date, currentApod!);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Добавлено в избранное')),
+                        );
+                      }
+                      setState(() {});
+                    },
+                  ),
+              ],
             ),
           ),
         ],
