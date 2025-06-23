@@ -1,16 +1,19 @@
-# tomahawk_space
+<div align="center">
+<img width="400" src="https://github.com/user-attachments/assets/3627346e-32e4-47aa-b02b-52e8c6ae1517"/>
+<h1>Tomahawk Space</h1>
+</div>
 
-A new Flutter project.
+- [Описание](Описание)
+- [Особенности](Особенности)
 
-## Getting Started
+## Описание
+Это приложение для просмотра изображений дня от NASA. С этим приложением будет удобно просматривать картинки и читать их описания.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Особенности
+- При первом запуске приложение попросит вас вставить свой ключ NASA. Его можно получить на их официальном сайте. Это бесплатно.
+- Есть 3 раздела: главная, избранное и настройки.
+- В главном разделе можно просматривать картинки. Можно выбрать конкретную дату публикации. Есть возможность добавить картинку с описанием в избранное, или наоборот, убрать.
+- В избранном находятся все картинки, которые вам понравились. На них можно нажать и вновь полюбоваться красотами космоса и почитать описание. Реализована возможность удалять картинки и в этом разделе.
+- В настройках можно сменить тему на тёмную или светлую. Там же есть возможность изменить свой ключ ля запросов картинок.
+- В приложении реализовано сохранение данных, полученных от NASA. Данные о понравившихся картинок сохраняются локально, чтобы не приходилось постоянно отправлять запросы для их получения.
+- Реализовано кеширование. При повторном просмотре картинки загружаются быстрее.
