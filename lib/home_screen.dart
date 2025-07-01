@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tomahawk_space/models/apod.dart';
+import 'package:tomahawk_space/overlay.dart';
 
 Future<Apod> fetchApod({String? date}) async {
   final prefs = await SharedPreferences.getInstance();
@@ -20,7 +21,9 @@ Future<Apod> fetchApod({String? date}) async {
   if (response.statusCode == 200) {
     return Apod.fromJson(jsonDecode(response.body));
   } else {
-    throw Exception('Не удалось загрузить изображение дня: ${response.statusCode}');
+    throw Exception(
+      'Не удалось загрузить изображение дня: ${response.statusCode}',
+    );
   }
 }
 
@@ -53,17 +56,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadApod() async {
     setState(() {
-      futureApod = fetchApod(date: _selectedDate).then((apod) {
-        setState(() {
-          currentApod = apod;
-        });
-        return apod;
-      }).catchError((error) {
-        setState(() {
-          currentApod = null;
-        });
-        throw error;
-      });
+      futureApod = fetchApod(date: _selectedDate)
+          .then((apod) {
+            setState(() {
+              currentApod = apod;
+            });
+            return apod;
+          })
+          .catchError((error) {
+            setState(() {
+              currentApod = null;
+            });
+            throw error;
+          });
     });
   }
 
@@ -159,81 +164,186 @@ class _HomeScreenState extends State<HomeScreen> {
                     final apod = snapshot.data!;
                     return SingleChildScrollView(
                       padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            apod.title,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          apod.mediaType == 'video'
-                              ? Column(
-                                  children: [
-                                    const Text(
-                                      'Это видео, а не изображение. Откройте по ссылке:',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    InkWell(
-                                      onTap: () async {
-                                        final Uri uri = Uri.parse(apod.url);
-                                        if (await canLaunchUrl(uri)) {
-                                          await launchUrl(uri);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    'Не удалось открыть ссылку: ${apod.url}')),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        apod.url,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          color: Colors.blue,
-                                          decoration: TextDecoration.underline,
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (constraints.maxWidth > 900) {
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: apod.mediaType == 'video'
+                                      ? Column(
+                                          children: [
+                                            const Text(
+                                              'Это видео, а не изображение. Откройте по ссылке:',
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            InkWell(
+                                              onTap: () async {
+                                                final Uri uri = Uri.parse(
+                                                  apod.url,
+                                                );
+                                                if (await canLaunchUrl(uri)) {
+                                                  await launchUrl(uri);
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        'Не удалось открыть ссылку: ${apod.url}',
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                              child: Text(
+                                                apod.url,
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  color: Colors.blue,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : CachedNetworkImage(
+                                          imageUrl: apod.url,
+                                          placeholder: (context, url) =>
+                                              const CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              const Text(
+                                                'Не удалось загрузить изображение.',
+                                              ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : CachedNetworkImage(
-                                  imageUrl: apod.url,
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Text(
-                                          'Не удалось загрузить изображение.'),
                                 ),
-                          const SizedBox(height: 16),
-                          Text(
-                            apod.explanation,
-                            textAlign: TextAlign.justify,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Дата: ${apod.date}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          apod.title,
+                                          style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          apod.explanation,
+                                          textAlign: TextAlign.justify,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Дата: ${apod.date}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  apod.title,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                apod.mediaType == 'video'
+                                    ? Column(
+                                        children: [
+                                          const Text(
+                                            'Это видео, а не изображение. Откройте по ссылке:',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          InkWell(
+                                            onTap: () async {
+                                              final Uri uri = Uri.parse(
+                                                apod.url,
+                                              );
+                                              if (await canLaunchUrl(uri)) {
+                                                await launchUrl(uri);
+                                              } else {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Не удалось открыть ссылку: ${apod.url}',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                            child: Text(
+                                              apod.url,
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.blue,
+                                                decoration:
+                                                    TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : CachedNetworkImage(
+                                        imageUrl: apod.url,
+                                        placeholder: (context, url) =>
+                                            const CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                                            const Text(
+                                              'Не удалось загрузить изображение.',
+                                            ),
+                                      ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  apod.explanation,
+                                  textAlign: TextAlign.justify,
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Дата: ${apod.date}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                        },
                       ),
                     );
                   } else {
                     return const Center(
-                      child:
-                          Text('Нажмите "Загрузить" для получения изображения.'),
+                      child: Text(
+                        'Нажмите "Загрузить" для получения изображения.',
+                      ),
                     );
                   }
                 },
@@ -241,7 +351,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 8.0,
+            ),
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
               boxShadow: [
@@ -271,13 +384,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () async {
                       if (favoritesBox.containsKey(currentApod!.date)) {
                         await favoritesBox.delete(currentApod!.date);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Удалено из избранного')),
+                        showCustomNotification(
+                          context,
+                          'Удалено из избранного',
                         );
                       } else {
                         await favoritesBox.put(currentApod!.date, currentApod!);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Добавлено в избранное')),
+                        showCustomNotification(
+                          context,
+                          'Добавлено в избранное',
                         );
                       }
                       setState(() {});

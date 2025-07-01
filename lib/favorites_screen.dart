@@ -35,20 +35,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               child: Text('Нет избранных изображений'),
             );
           } else {
-            return ListView.builder(
+            return GridView.builder(
+              padding: const EdgeInsets.all(12.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4, // Количество столбцов
+                crossAxisSpacing: 12.0, // Отступ между столбцами
+                mainAxisSpacing: 12.0, // Отступ между строками
+                childAspectRatio: 1.0, // Соотношение сторон (квадратные элементы)
+              ),
               itemCount: box.length,
               itemBuilder: (context, index) {
                 final apod = box.getAt(index)!;
-                return ListTile(
-                  title: Text(apod.title),
-                  subtitle: Text(apod.date),
-                  leading: CachedNetworkImage(
-                      imageUrl: apod.url,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
-                    ),
+                return GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
@@ -57,6 +55,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       ),
                     );
                   },
+                  child: MouseRegion(
+                    cursor: SystemMouseCursors.click, // Курсор указателя при наведении
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.0), // Закругление углов
+                      child: apod.mediaType == 'video'
+                          ? Container(
+                              color: Colors.grey[300],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.videocam,
+                                  size: 50.0,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            )
+                          : CachedNetworkImage(
+                              imageUrl: apod.url,
+                              fit: BoxFit.cover, // Заполнить всю область
+                              placeholder: (context, url) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              errorWidget: (context, url, error) => const Center(
+                                child: Icon(Icons.error, size: 50.0),
+                              ),
+                            ),
+                    ),
+                  ),
                 );
               },
             );

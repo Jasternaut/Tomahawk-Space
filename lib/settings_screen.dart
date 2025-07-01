@@ -68,6 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ),
+            
             const SizedBox(height: 20),
             TextField(
               controller: _apiKeyController,
