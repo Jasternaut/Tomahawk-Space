@@ -149,3 +149,7 @@ generated/
 # Your specific sensitive files
 android/app/src/main/AndroidManifest.xml.bak
 ios/Runner/Info.plist.bak
+
+# Android keys
+/android/key.properties
+/key.jks

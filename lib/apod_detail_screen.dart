@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tomahawk_space/models/apod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:tomahawk_space/overlay.dart';
 
 class ApodDetailScreen extends StatelessWidget {
   final Apod apod;
@@ -20,9 +21,7 @@ class ApodDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.delete),
             onPressed: () async {
               await box.delete(apod.date);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Удалено из избранного')),
-              );
+              showCustomNotification(context, 'Удалено из избранного');
               Navigator.pop(context);
             },
           ),
@@ -53,12 +52,9 @@ class ApodDetailScreen extends StatelessWidget {
                                   if (await canLaunchUrl(uri)) {
                                     await launchUrl(uri);
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Не удалось открыть ссылку: ${apod.url}',
-                                        ),
-                                      ),
+                                    showCustomNotification(
+                                      context,
+                                      'Не удалось открыть ссылку: ${apod.url}',
                                     );
                                   }
                                 },
@@ -145,13 +141,7 @@ class ApodDetailScreen extends StatelessWidget {
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri);
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Не удалось открыть ссылку: ${apod.url}',
-                                      ),
-                                    ),
-                                  );
+                                  showCustomNotification(context, 'Не удалось открыть ссылку: ${apod.url}');
                                 }
                               },
                               child: Text(

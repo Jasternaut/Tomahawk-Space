@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tomahawk_space/theme_provider.dart';
+import 'package:tomahawk_space/overlay.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -42,19 +43,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _errorMessage = null;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Ключ API сохранён')),
-    );
+    showCustomNotification(context, 'Ключ API сохранён');
   }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Настройки'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Настройки'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -68,7 +64,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ),
-            
+
             const SizedBox(height: 20),
             TextField(
               controller: _apiKeyController,

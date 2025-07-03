@@ -1,80 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:tomahawk_space/theme_provider.dart';
 
 void showCustomNotification(BuildContext context, String message) {
-  // Создаем AnimationController
   final AnimationController controller = AnimationController(
-    duration: const Duration(milliseconds: 300), // Длительность анимации
+    duration: const Duration(milliseconds: 300),
     vsync: Navigator.of(context),
   );
   final Animation<Offset> offsetAnimation = Tween<Offset>(
-    begin: const Offset(0.0, -1.0), // Начало: за пределами экрана сверху
-    end: Offset.zero, // Конец: на своем месте
+    begin: const Offset(0.0, -1.0),
+    end: Offset.zero,
   ).animate(CurvedAnimation(
     parent: controller,
     curve: Curves.easeOut,
   ));
 
-  // Создаем OverlayEntry
   OverlayEntry overlayEntry = OverlayEntry(
-    builder: (context) => SlideTransition(
-      position: offsetAnimation,
-      child: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter, // Размещаем уведомление вверху по центру
-          child: Padding(
-            padding: const EdgeInsets.only(top: 50.0, left: 10.0, right: 10.0),
-            child: Material(
-              color: Colors.transparent,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 400.0, // Ограничиваем максимальную ширину
-                  minHeight: 48.0, // Минимальная высота для текста
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 12.0,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(8.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.white.withOpacity(0.3), // Цвет свечения
-                        blurRadius: 10.0, // Радиус свечения
-                        spreadRadius: 2.0, // Распространение свечения
-                        offset: const Offset(0, 0), // Без смещения
+    builder: (context) {
+      return Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          final isDarkTheme = themeProvider.isDarkTheme;
+          return SlideTransition(
+            position: offsetAnimation,
+            child: SafeArea(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 50.0, left: 10.0, right: 10.0),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 400.0,
+                        minHeight: 48.0,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w500,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 12.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDarkTheme
+                              ? Colors.white
+                              : Colors.black,
+                          borderRadius: BorderRadius.circular(50.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: isDarkTheme
+                                  ? Colors.black.withOpacity(0.3)
+                                  : Colors.grey.withOpacity(0.5),
+                              blurRadius: 10.0,
+                              spreadRadius: 2.0,
+                              offset: const Offset(0, 0),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          message,
+                          style: TextStyle(
+                            color: isDarkTheme
+                                ? Colors.black
+                                : Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    ),
+          );
+        },
+      );
+    },
   );
 
-  // Вставляем OverlayEntry
   Overlay.of(context).insert(overlayEntry);
 
-  // Запускаем анимацию появления
   controller.forward();
 
-  // Удаляем через 2 секунды с анимацией исчезновения
   Future.delayed(const Duration(seconds: 2), () async {
-    await controller.reverse(); // Запускаем обратную анимацию
-    overlayEntry.remove(); // Удаляем после завершения анимации
-    controller.dispose(); // Очищаем контроллер
+    await controller.reverse();
+    overlayEntry.remove();
+    controller.dispose();
   });
 }

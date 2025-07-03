@@ -45,7 +45,13 @@ class MyApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return MaterialApp(
             title: 'Tomahawk Space',
-            theme: themeProvider.currentTheme,
+            theme: ThemeData(
+              useMaterial3: true, // Включаем Material 3
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color.fromARGB(255, 146, 39, 196), // const Color.fromARGB(255, 243, 192, 80),
+                brightness: themeProvider.isDarkTheme ? Brightness.dark : Brightness.light,
+              ),
+            ),
             localizationsDelegates: const [
               DefaultMaterialLocalizations.delegate,
               DefaultWidgetsLocalizations.delegate,
@@ -104,6 +110,21 @@ class _MyHomePageState extends State<MyHomePage> {
     SettingsScreen(),
   ];
 
+  static const List<NavigationDestination> _navDestinations = [
+    NavigationDestination(
+      icon: Icon(Icons.home),
+      label: 'Главная',
+    ),
+    NavigationDestination(
+      icon: Icon(Icons.favorite),
+      label: 'Избранное',
+    ),
+    NavigationDestination(
+      icon: Icon(Icons.settings),
+      label: 'Настройки',
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -124,27 +145,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Главная',
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          body: _widgetOptions.elementAt(_selectedIndex),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            destinations: _navDestinations,
+            backgroundColor: themeProvider.isDarkTheme
+                ? Colors.grey[900]
+                : Colors.white,
+            indicatorColor: themeProvider.isDarkTheme
+                ? const Color.fromARGB(255, 140, 57, 153)
+                : const Color.fromARGB(255, 235, 142, 250),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+            elevation: 4, // Добавляет тень для современного вида
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Избранное',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Настройки',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
+        );
+      },
     );
   }
 }

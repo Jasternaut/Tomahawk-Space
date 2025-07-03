@@ -7,6 +7,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tomahawk_space/models/apod.dart';
 import 'package:tomahawk_space/overlay.dart';
+import 'package:provider/provider.dart';
+import 'package:tomahawk_space/theme_provider.dart';
 
 Future<Apod> fetchApod({String? date}) async {
   final prefs = await SharedPreferences.getInstance();
@@ -76,16 +78,15 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('TOMAHAWK'),
-            const SizedBox(width: 8),
-            Image.asset(
-              'assets/icons/logo.png',
-              height: 24, // Настрой размер изображения
-            ),
-          ],
+        title: Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            return Image.asset(
+              themeProvider.isDarkTheme
+                  ? 'assets/icons/logo_dark.png'
+                  : 'assets/icons/logo_light.png',
+              height: 24,
+            );
+          },
         ),
         centerTitle: true,
       ),
