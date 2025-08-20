@@ -22,26 +22,42 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surfaceContainerLow,
       appBar: AppBar(
-        title: const Text('Избранное'),
+        title: Text(
+          'Избранное',
+          style: textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: colorScheme.surfaceContainer,
       ),
       body: ValueListenableBuilder(
         valueListenable: favoritesBox.listenable(),
         builder: (context, Box<Apod> box, _) {
           if (box.isEmpty) {
-            return const Center(
-              child: Text('Нет избранных изображений'),
+            return Center(
+              child: Text(
+                'Нет избранных изображений',
+                style: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
             );
           } else {
             return GridView.builder(
               padding: const EdgeInsets.all(12.0),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, // Количество столбцов
-                crossAxisSpacing: 12.0, // Отступ между столбцами
-                mainAxisSpacing: 12.0, // Отступ между строками
-                childAspectRatio: 1.0, // Соотношение сторон (квадратные элементы)
+                crossAxisCount: 4,
+                crossAxisSpacing: 12.0,
+                mainAxisSpacing: 12.0,
+                childAspectRatio: 1.0,
               ),
               itemCount: box.length,
               itemBuilder: (context, index) {
@@ -56,30 +72,43 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     );
                   },
                   child: MouseRegion(
-                    cursor: SystemMouseCursors.click, // Курсор указателя при наведении
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0), // Закругление углов
-                      child: apod.mediaType == 'video'
-                          ? Container(
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.videocam,
-                                  size: 50.0,
-                                  color: Colors.black54,
+                    cursor: SystemMouseCursors.click,
+                    child: Card(
+                      elevation: 2,
+                      color: colorScheme.surfaceContainerLow,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: apod.mediaType == 'video'
+                            ? Container(
+                                color: colorScheme.surfaceContainer,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.videocam,
+                                    size: 50.0,
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              )
+                            : CachedNetworkImage(
+                                imageUrl: apod.url,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(
+                                    color: colorScheme.primary,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Icon(
+                                    Icons.error,
+                                    size: 50.0,
+                                    color: colorScheme.error,
+                                  ),
                                 ),
                               ),
-                            )
-                          : CachedNetworkImage(
-                              imageUrl: apod.url,
-                              fit: BoxFit.cover, // Заполнить всю область
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) => const Center(
-                                child: Icon(Icons.error, size: 50.0),
-                              ),
-                            ),
+                      ),
                     ),
                   ),
                 );

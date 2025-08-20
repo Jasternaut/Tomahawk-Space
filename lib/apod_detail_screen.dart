@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:tomahawk_space/models/apod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tomahawk_space/overlay.dart';
+import 'package:flutter/services.dart';
 
 class ApodDetailScreen extends StatelessWidget {
   final Apod apod;
@@ -12,14 +13,29 @@ class ApodDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
     final box = Hive.box<Apod>('favorites');
+
     return Scaffold(
+      backgroundColor: colorScheme.surfaceContainerLow,
       appBar: AppBar(
-        title: Text(apod.title),
+        title: Text(
+          apod.title,
+          style: textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: colorScheme.surfaceContainer,
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: Icon(
+              Icons.delete,
+              color: colorScheme.error,
+            ),
             onPressed: () async {
+              HapticFeedback.lightImpact();
               await box.delete(apod.date);
               showCustomNotification(context, 'Удалено из избранного');
               Navigator.pop(context);
@@ -33,7 +49,7 @@ class ApodDetailScreen extends StatelessWidget {
           builder: (context, constraints) {
             if (constraints.maxWidth > 900) {
               return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     flex: 1,
@@ -41,9 +57,12 @@ class ApodDetailScreen extends StatelessWidget {
                         ? Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
+                              Text(
                                 'Это видео, а не изображение. Откройте по ссылке:',
                                 textAlign: TextAlign.center,
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.onSurface,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               InkWell(
@@ -61,8 +80,8 @@ class ApodDetailScreen extends StatelessWidget {
                                 child: Text(
                                   apod.url,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: Colors.blue,
+                                  style: textTheme.bodyLarge?.copyWith(
+                                    color: colorScheme.primary,
                                     decoration: TextDecoration.underline,
                                   ),
                                 ),
@@ -72,11 +91,18 @@ class ApodDetailScreen extends StatelessWidget {
                         : CachedNetworkImage(
                             imageUrl: apod.url,
                             fit: BoxFit.contain,
-                            placeholder: (context, url) => const Center(
-                              child: CircularProgressIndicator(),
+                            placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(
+                                color: colorScheme.primary,
+                              ),
                             ),
-                            errorWidget: (context, url, error) => const Center(
-                              child: Text('Не удалось загрузить изображение.'),
+                            errorWidget: (context, url, error) => Center(
+                              child: Text(
+                                'Не удалось загрузить изображение.',
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.error,
+                                ),
+                              ),
                             ),
                           ),
                   ),
@@ -89,8 +115,8 @@ class ApodDetailScreen extends StatelessWidget {
                         children: [
                           Text(
                             apod.title,
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: textTheme.headlineSmall?.copyWith(
+                              color: colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -98,15 +124,16 @@ class ApodDetailScreen extends StatelessWidget {
                           Text(
                             apod.explanation,
                             textAlign: TextAlign.justify,
-                            style: const TextStyle(fontSize: 16),
+                            style: textTheme.bodyLarge?.copyWith(
+                              color: colorScheme.onSurface,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Дата: ${apod.date}',
-                            style: const TextStyle(
-                              fontSize: 14,
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
                               fontStyle: FontStyle.italic,
-                              color: Colors.grey,
                             ),
                           ),
                         ],
@@ -121,8 +148,8 @@ class ApodDetailScreen extends StatelessWidget {
                   Text(
                     apod.title,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -130,9 +157,12 @@ class ApodDetailScreen extends StatelessWidget {
                   apod.mediaType == 'video'
                       ? Column(
                           children: [
-                            const Text(
+                            Text(
                               'Это видео, а не изображение. Откройте по ссылке:',
                               textAlign: TextAlign.center,
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.onSurface,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             InkWell(
@@ -141,14 +171,17 @@ class ApodDetailScreen extends StatelessWidget {
                                 if (await canLaunchUrl(uri)) {
                                   await launchUrl(uri);
                                 } else {
-                                  showCustomNotification(context, 'Не удалось открыть ссылку: ${apod.url}');
+                                  showCustomNotification(
+                                    context,
+                                    'Не удалось открыть ссылку: ${apod.url}',
+                                  );
                                 }
                               },
                               child: Text(
                                 apod.url,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.blue,
+                                style: textTheme.bodyLarge?.copyWith(
+                                  color: colorScheme.primary,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -158,25 +191,34 @@ class ApodDetailScreen extends StatelessWidget {
                       : CachedNetworkImage(
                           imageUrl: apod.url,
                           fit: BoxFit.contain,
-                          placeholder: (context, url) =>
-                              const Center(child: CircularProgressIndicator()),
-                          errorWidget: (context, url, error) => const Center(
-                            child: Text('Не удалось загрузить изображение.'),
+                          placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                              color: colorScheme.primary,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Center(
+                            child: Text(
+                              'Не удалось загрузить изображение.',
+                              style: textTheme.bodyLarge?.copyWith(
+                                color: colorScheme.error,
+                              ),
+                            ),
                           ),
                         ),
                   const SizedBox(height: 16),
                   Text(
                     apod.explanation,
                     textAlign: TextAlign.justify,
-                    style: const TextStyle(fontSize: 16),
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Дата: ${apod.date}',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
                       fontStyle: FontStyle.italic,
-                      color: Colors.grey,
                     ),
                   ),
                 ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tomahawk_space/overlay.dart';
+import 'package:flutter/services.dart';
 
 class ApiKeyScreen extends StatefulWidget {
   const ApiKeyScreen({super.key});
@@ -13,6 +15,7 @@ class _ApiKeyScreenState extends State<ApiKeyScreen> {
   String? _errorMessage;
 
   Future<void> _saveApiKey() async {
+    HapticFeedback.lightImpact();
     final apiKey = _controller.text.trim();
     if (apiKey.isEmpty) {
       setState(() {
@@ -23,25 +26,39 @@ class _ApiKeyScreenState extends State<ApiKeyScreen> {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('nasa_api_key', apiKey);
+    showCustomNotification(context, 'Ключ API сохранён');
     Navigator.pushReplacementNamed(context, '/home');
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surfaceContainerLow,
       appBar: AppBar(
-        title: const Text('Введите ключ NASA API'),
+        title: Text(
+          'Введите ключ NASA API',
+          style: textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         centerTitle: true,
+        backgroundColor: colorScheme.surfaceContainer,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Для загрузки изображений введите ваш ключ NASA API. Получить ключ можно на сайте api.nasa.gov.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 20),
             TextField(
@@ -50,12 +67,31 @@ class _ApiKeyScreenState extends State<ApiKeyScreen> {
                 labelText: 'Ключ NASA API',
                 border: const OutlineInputBorder(),
                 errorText: _errorMessage,
+                errorStyle: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.error,
+                ),
+                labelStyle: textTheme.bodyLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _saveApiKey,
-              child: const Text('Сохранить и продолжить'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+              ),
+              child: Text(
+                'Сохранить и продолжить',
+                style: textTheme.labelLarge?.copyWith(
+                  color: colorScheme.onPrimary,
+                ),
+              ),
             ),
           ],
         ),

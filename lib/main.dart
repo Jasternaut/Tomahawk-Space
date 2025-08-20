@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,13 +8,16 @@ import 'package:tomahawk_space/favorites_screen.dart';
 import 'package:tomahawk_space/settings_screen.dart';
 import 'package:tomahawk_space/api_key_screen.dart';
 import 'package:tomahawk_space/models/apod.dart';
-import 'package:tomahawk_space/theme_provider.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(ApodAdapter());
   await Hive.openBox<Apod>('favorites');
+  await SettingsScreen.loadSelectedColor();
+  await SettingsScreen.loadDynamicThemePreference();
+  await SettingsScreen.loadBrightnessPreference();
   runApp(const MyApp());
 }
 
@@ -31,7 +34,7 @@ class MyApp extends StatelessWidget {
     final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
     if (isFirstLaunch) {
       await prefs.setBool('isFirstLaunch', false);
-      await prefs.setInt('selected_tab', 0); // Вкладка "Главная" для первого запуска
+      await prefs.setInt('selected_tab', 0);
       return 0;
     }
     return prefs.getInt('selected_tab') ?? 0;
@@ -39,56 +42,94 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
-          return MaterialApp(
-            title: 'Tomahawk Space',
-            theme: ThemeData(
-              useMaterial3: true, // Включаем Material 3
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: const Color.fromARGB(255, 146, 39, 196), // const Color.fromARGB(255, 243, 192, 80),
-                brightness: themeProvider.isDarkTheme ? Brightness.dark : Brightness.light,
-              ),
-            ),
-            localizationsDelegates: const [
-              DefaultMaterialLocalizations.delegate,
-              DefaultWidgetsLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''),
-              Locale('ru', ''),
-            ],
-            home: FutureBuilder<bool>(
-              future: _hasApiKey(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (snapshot.hasData && snapshot.data == true) {
-                  return FutureBuilder<int>(
-                    future: _getInitialTabIndex(),
-                    builder: (context, indexSnapshot) {
-                      if (indexSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return MyHomePage(initialIndex: indexSnapshot.data ?? 0);
-                    },
-                  );
-                }
-                return const ApiKeyScreen();
+    return ValueListenableBuilder(
+      valueListenable: SettingsScreen.selectedColor,
+      builder: (context, selectedColor, _) {
+        return ValueListenableBuilder(
+          valueListenable: SettingsScreen.useDynamicTheme,
+          builder: (context, useDynamicTheme, _) {
+            return ValueListenableBuilder(
+              valueListenable: SettingsScreen.selectedBrightness,
+              builder: (context, selectedBrightness, _) {
+                return DynamicColorBuilder(
+                  builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
+                    final lightColorScheme = useDynamicTheme && lightDynamic != null
+                        ? lightDynamic
+                        : ColorScheme.fromSeed(
+                            seedColor: selectedColor,
+                            brightness: Brightness.light,
+                          );
+                    final darkColorScheme = useDynamicTheme && darkDynamic != null
+                        ? darkDynamic
+                        : ColorScheme.fromSeed(
+                            seedColor: selectedColor,
+                            brightness: Brightness.dark,
+                          );
+                    return MaterialApp(
+                      title: 'Tomahawk Space',
+                      theme: ThemeData(
+                        useMaterial3: true,
+                        colorScheme: lightColorScheme,
+                        pageTransitionsTheme: const PageTransitionsTheme(
+                          builders: {
+                            TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+                            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                          },
+                        ),
+                      ),
+                      darkTheme: ThemeData(
+                        useMaterial3: true,
+                        colorScheme: darkColorScheme,
+                        pageTransitionsTheme: const PageTransitionsTheme(
+                          builders: {
+                            TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+                            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                          },
+                        ),
+                      ),
+                      themeMode: useDynamicTheme ? ThemeMode.system : ThemeMode.values[selectedBrightness.index],
+                      localizationsDelegates: const [
+                        DefaultMaterialLocalizations.delegate,
+                        DefaultWidgetsLocalizations.delegate,
+                        GlobalMaterialLocalizations.delegate,
+                        GlobalWidgetsLocalizations.delegate,
+                        GlobalCupertinoLocalizations.delegate,
+                      ],
+                      supportedLocales: const [
+                        Locale('en', ''),
+                        Locale('ru', ''),
+                      ],
+                      home: FutureBuilder<bool>(
+                        future: _hasApiKey(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasData && snapshot.data == true) {
+                            return FutureBuilder<int>(
+                              future: _getInitialTabIndex(),
+                              builder: (context, indexSnapshot) {
+                                if (indexSnapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                return MyHomePage(initialIndex: indexSnapshot.data ?? 0);
+                              },
+                            );
+                          }
+                          return const ApiKeyScreen();
+                        },
+                      ),
+                      routes: {
+                        '/home': (context) => const MyHomePage(),
+                      },
+                    );
+                  },
+                );
               },
-            ),
-            routes: {
-              '/home': (context) => const MyHomePage(),
-            },
-          );
-        },
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -145,25 +186,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return Scaffold(
-          body: _widgetOptions.elementAt(_selectedIndex),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onItemTapped,
-            destinations: _navDestinations,
-            backgroundColor: themeProvider.isDarkTheme
-                ? Colors.grey[900]
-                : Colors.white,
-            indicatorColor: themeProvider.isDarkTheme
-                ? const Color.fromARGB(255, 140, 57, 153)
-                : const Color.fromARGB(255, 235, 142, 250),
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            elevation: 4, // Добавляет тень для современного вида
-          ),
-        );
-      },
+    final colorScheme = Theme.of(context).colorScheme;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: colorScheme.surfaceContainer, // Фон системной панели совпадает с NavigationBar
+      systemNavigationBarIconBrightness:
+          colorScheme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+    ));
+    
+    return Scaffold(
+      backgroundColor: colorScheme.surfaceContainerLow,
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: _onItemTapped,
+        destinations: _navDestinations,
+        indicatorColor: colorScheme.primaryContainer,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        elevation: 4,
+        backgroundColor: colorScheme.surfaceContainer,
+      ),
     );
   }
 }
