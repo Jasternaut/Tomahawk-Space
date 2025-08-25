@@ -18,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
     final prefs = await SharedPreferences.getInstance();
     final colorValue =
         prefs.getInt('selected_color') ??
-        const Color.fromARGB(255, 146, 39, 196).value;
+        const Color.fromARGB(255, 146, 39, 196).toARGB32(); // value
     selectedColor.value = Color(colorValue);
   }
 
@@ -39,7 +39,11 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAliveClientMixin {
+
+  @override
+  bool get wantKeepAlive => true;
+
   final TextEditingController _apiKeyController = TextEditingController();
   final TextEditingController _proxyAddressController = TextEditingController();
   final TextEditingController _proxyPortController = TextEditingController();
@@ -197,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // Сохранение настроек прокси в SharedPreferences
   Future<void> _saveSelectedColor(Color color, Brightness brightness) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('selected_color', color.value);
+    await prefs.setInt('selected_color', color.toARGB32()); // value
     await prefs.setString(
       'theme_brightness',
       brightness == Brightness.light ? 'light' : 'dark',
@@ -224,6 +228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -244,7 +249,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Раздел "Внешний вид"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainer,
+            color: colorScheme.surfaceContainerHigh,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -265,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   ListTile(
                     title: Text(
-                      'Использовать динамическую тему (на основе обоев)',
+                      'Использовать динамическую тему',
                       style: textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurface,
                       ),
@@ -279,8 +284,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             HapticFeedback.lightImpact();
                             _saveDynamicThemePreference(newValue);
                           },
-                          activeColor: colorScheme.primary,
-                          activeTrackColor: colorScheme.primaryContainer,
+                          activeThumbColor: colorScheme.primary,
+                          activeTrackColor: colorScheme.surfaceContainerLow
                         );
                       },
                     ),
@@ -380,7 +385,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Раздел "Ключ NASA"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainer,
+            color: colorScheme.surfaceContainerHigh,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -447,7 +452,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Раздел "Настройки прокси"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainer,
+            color: colorScheme.surfaceContainerHigh,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -482,8 +487,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         HapticFeedback.lightImpact();
                         _saveProxySwitch(newValue);
                       },
-                      activeColor: colorScheme.primary,
-                      activeTrackColor: colorScheme.primaryContainer,
+                      activeThumbColor: colorScheme.primary,
+                      activeTrackColor: colorScheme.surfaceContainerLow,
                     ),
                   ),
                   Padding(
@@ -579,10 +584,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _useProxy
                             ? colorScheme.primary
-                            : colorScheme.onSurface.withOpacity(0.12),
+                            : colorScheme.onSurface.withValues(alpha: 0.12),
                         foregroundColor: _useProxy
                             ? colorScheme.onPrimary
-                            : colorScheme.onSurface.withOpacity(0.38),
+                            : colorScheme.onSurface.withValues(alpha: 0.38),
                         padding: const EdgeInsets.symmetric(
                           vertical: 16.0,
                           horizontal: 32.0,
@@ -593,7 +598,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         style: textTheme.labelLarge?.copyWith(
                           color: _useProxy
                               ? colorScheme.onPrimary
-                              : colorScheme.onSurface.withOpacity(0.38),
+                              : colorScheme.onSurface.withValues(alpha: 0.38),
                         ),
                       ),
                     ),

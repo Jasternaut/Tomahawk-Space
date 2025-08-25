@@ -64,7 +64,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   late Future<Apod>? futureApod;
   String? _selectedDate;
   Apod? currentApod;
@@ -72,10 +72,28 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _dateController = TextEditingController();
   final Box<Apod> favoritesBox = Hive.box<Apod>('favorites');
 
+  // ИЗМЕНЕНИЕ: Статическая переменная для кэширования APOD (только для текущей даты, до перезапуска приложения)
+  static Apod? _cachedApod;
+
+  @override
+  bool get wantKeepAlive => true; // Сохраняем состояние экрана
+
   @override
   void initState() {
     super.initState();
-    _loadApod();
+    // ИЗМЕНЕНИЕ: Загружаем только если дата не выбрана и кэш пуст
+    if (_selectedDate == null && _cachedApod == null) {
+      _loadApod();
+    } else if (_selectedDate == null && _cachedApod != null) {
+      // Используем кэш
+      setState(() {
+        currentApod = _cachedApod;
+        futureApod = Future.value(_cachedApod);
+      });
+    } else {
+      // Если дата выбрана, загружаем как обычно
+      _loadApod();
+    }
   }
 
   @override
@@ -90,6 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
           .then((apod) {
             setState(() {
               currentApod = apod;
+              // ИЗМЕНЕНИЕ: Кэшируем только если дата не выбрана (т.е. это сегодняшняя APOD)
+              if (_selectedDate == null) {
+                _cachedApod = apod;
+              }
             });
             return apod;
           })
@@ -104,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -142,10 +165,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (!_isDateSelectionEnabled) {
                           _selectedDate = null;
                           _dateController.clear();
+                          // ИЗМЕНЕНИЕ: При отключении даты используем кэш, если есть
+                          if (_cachedApod != null) {
+                            currentApod = _cachedApod;
+                            futureApod = Future.value(_cachedApod);
+                          } else {
+                            _loadApod();
+                          }
                         }
                       });
                     },
-                    activeColor: colorScheme.primary,
+                    activeThumbColor: colorScheme.primary,
                     activeTrackColor: colorScheme.primaryContainer,
                   ),
                 ),
@@ -181,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               _selectedDate =
                                   "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
                               _dateController.text = _selectedDate!;
+                              _loadApod(); // Загружаем для выбранной даты
                             });
                           }
                         },
@@ -471,7 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: colorScheme.surfaceContainer,
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.shadow.withOpacity(0.1),
+                  color: colorScheme.shadow.withValues(alpha: 0.1),
                   blurRadius: 4,
                   offset: const Offset(0, -2),
                 ),

@@ -87,7 +87,7 @@ class MyApp extends StatelessWidget {
                           },
                         ),
                       ),
-                      themeMode: useDynamicTheme ? ThemeMode.system : ThemeMode.values[selectedBrightness.index],
+                      themeMode: useDynamicTheme ? ThemeMode.system : (selectedBrightness == Brightness.light ? ThemeMode.light : ThemeMode.dark),
                       localizationsDelegates: const [
                         DefaultMaterialLocalizations.delegate,
                         DefaultWidgetsLocalizations.delegate,
@@ -189,14 +189,17 @@ class _MyHomePageState extends State<MyHomePage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: colorScheme.surfaceContainer, // Фон системной панели совпадает с NavigationBar
+      systemNavigationBarColor: colorScheme.surfaceContainer,
       systemNavigationBarIconBrightness:
           colorScheme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
     ));
-    
+
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainerLow,
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
