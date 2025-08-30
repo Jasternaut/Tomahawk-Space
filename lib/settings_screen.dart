@@ -249,7 +249,7 @@ class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAlive
           // Раздел "Внешний вид"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainerHigh,
+            color: colorScheme.surfaceContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -284,8 +284,8 @@ class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAlive
                             HapticFeedback.lightImpact();
                             _saveDynamicThemePreference(newValue);
                           },
-                          activeThumbColor: colorScheme.primary,
-                          activeTrackColor: colorScheme.surfaceContainerLow
+                          activeThumbColor: colorScheme.onInverseSurface,
+                          activeTrackColor: colorScheme.onSurfaceVariant
                         );
                       },
                     ),
@@ -385,7 +385,7 @@ class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAlive
           // Раздел "Ключ NASA"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainerHigh,
+            color: colorScheme.surfaceContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -452,7 +452,7 @@ class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAlive
           // Раздел "Настройки прокси"
           Card(
             elevation: 2,
-            color: colorScheme.surfaceContainerHigh,
+            color: colorScheme.surfaceContainer,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
@@ -487,8 +487,8 @@ class _SettingsScreenState extends State<SettingsScreen> with AutomaticKeepAlive
                         HapticFeedback.lightImpact();
                         _saveProxySwitch(newValue);
                       },
-                      activeThumbColor: colorScheme.primary,
-                      activeTrackColor: colorScheme.surfaceContainerLow,
+                      activeThumbColor: colorScheme.onInverseSurface,
+                      activeTrackColor: colorScheme.onSurfaceVariant,
                     ),
                   ),
                   Padding(
