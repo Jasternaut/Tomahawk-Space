@@ -98,6 +98,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> with AutomaticKeepAli
                               )
                             : CachedNetworkImage(
                                 imageUrl: apod.url,
+                                imageBuilder: (context, imageProvider) => Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            height: 400,
+                                          ),
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => Center(
                                   child: CircularProgressIndicator(

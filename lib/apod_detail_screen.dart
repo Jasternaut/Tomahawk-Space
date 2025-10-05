@@ -90,6 +90,16 @@ class ApodDetailScreen extends StatelessWidget {
                           )
                         : CachedNetworkImage(
                             imageUrl: apod.url,
+                            imageBuilder: (context, imageProvider) => Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            height: 400,
+                                          ),
                             fit: BoxFit.contain,
                             placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(
@@ -113,13 +123,6 @@ class ApodDetailScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            apod.title,
-                            style: textTheme.headlineSmall?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                           const SizedBox(height: 16),
                           Text(
                             apod.explanation,
@@ -145,14 +148,6 @@ class ApodDetailScreen extends StatelessWidget {
             } else {
               return Column(
                 children: [
-                  Text(
-                    apod.title,
-                    textAlign: TextAlign.center,
-                    style: textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                   const SizedBox(height: 16),
                   apod.mediaType == 'video'
                       ? Column(
@@ -190,6 +185,16 @@ class ApodDetailScreen extends StatelessWidget {
                         )
                       : CachedNetworkImage(
                           imageUrl: apod.url,
+                          imageBuilder: (context, imageProvider) => Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            height: 400,
+                                          ),
                           fit: BoxFit.contain,
                           placeholder: (context, url) => Center(
                             child: CircularProgressIndicator(

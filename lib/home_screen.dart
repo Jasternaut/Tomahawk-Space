@@ -71,8 +71,6 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   bool _isDateSelectionEnabled = false;
   final TextEditingController _dateController = TextEditingController();
   final Box<Apod> favoritesBox = Hive.box<Apod>('favorites');
-
-  // ИЗМЕНЕНИЕ: Статическая переменная для кэширования APOD (только для текущей даты, до перезапуска приложения)
   static Apod? _cachedApod;
 
   @override
@@ -81,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   @override
   void initState() {
     super.initState();
-    // ИЗМЕНЕНИЕ: Загружаем только если дата не выбрана и кэш пуст
     if (_selectedDate == null && _cachedApod == null) {
       _loadApod();
     } else if (_selectedDate == null && _cachedApod != null) {
@@ -108,7 +105,6 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           .then((apod) {
             setState(() {
               currentApod = apod;
-              // ИЗМЕНЕНИЕ: Кэшируем только если дата не выбрана (т.е. это сегодняшняя APOD)
               if (_selectedDate == null) {
                 _cachedApod = apod;
               }
@@ -164,8 +160,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                         _isDateSelectionEnabled = newValue;
                         if (!_isDateSelectionEnabled) {
                           _selectedDate = null;
-                          _dateController.clear();
-                          // ИЗМЕНЕНИЕ: При отключении даты используем кэш, если есть
+                          _dateController.clear(); 
                           if (_cachedApod != null) {
                             currentApod = _cachedApod;
                             futureApod = Future.value(_cachedApod);
@@ -235,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       );
                     },
                   ),
-                const SizedBox(height: 16),
+                
               ],
             ),
           ),
@@ -324,7 +319,17 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                           ],
                                         )
                                       : CachedNetworkImage(
-                                          imageUrl: apod.url,
+                                          imageUrl: apod.url,    
+                                          imageBuilder: (context, imageProvider) => Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            height: 400,
+                                          ),
                                           placeholder: (context, url) =>
                                               CircularProgressIndicator(
                                                 color: colorScheme.primary,
@@ -445,6 +450,16 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                       )
                                     : CachedNetworkImage(
                                         imageUrl: apod.url,
+                                        imageBuilder: (context, imageProvider) => Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            height: 400,
+                                          ),
                                         placeholder: (context, url) =>
                                             CircularProgressIndicator(
                                               color: colorScheme.primary,
