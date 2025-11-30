@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.TomahawkSpace" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Цвет фона экрана Splash Screen для Android 12+ -->
+        <item name="android:windowSplashScreenBackground">@color/splash_background</item>
+        
+        <!-- Цвет статус бара и навигации при старте -->
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background</item>
+        
+        <!-- Для Android < 12, чтобы не было белой вспышки -->
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
+</resources>
