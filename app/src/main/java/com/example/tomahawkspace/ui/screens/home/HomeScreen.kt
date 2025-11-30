@@ -250,7 +250,7 @@ fun HomeScreen(
                             Icon(
                                 imageVector = if (successState.isLiked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Лайк",
-                                tint = if (successState.isLiked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                tint = if (successState.isLiked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.secondary
                             )
                         }
                     }
