@@ -2,15 +2,27 @@ package com.tomahawk.space
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.tomahawk.space.data.AuthRepository
+import com.tomahawk.space.ui.screens.auth.AuthScreen
+import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.theme.TomahawkSpaceTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,30 +30,54 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TomahawkSpaceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            val darkTheme = isSystemInDarkTheme()
+
+            DisposableEffect(darkTheme) {
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { darkTheme },
+                    navigationBarStyle = SystemBarStyle.auto(
+                        android.graphics.Color.TRANSPARENT,
+                        android.graphics.Color.TRANSPARENT,
+                    ) { darkTheme }
+                )
+                onDispose {}
+            }
+
+            TomahawkSpaceTheme(darkTheme = darkTheme) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    val context = LocalContext.current
+                    val repository = remember { AuthRepository(context) }
+
+                    var startDestination by remember { mutableStateOf<String?>(null) }
+
+                    LaunchedEffect(Unit) {
+                        val savedKey = repository.getKey()
+                        startDestination = if (savedKey != null) "main" else "auth"
+                    }
+
+                    startDestination?.let { destination ->
+                        NavHost(navController = navController, startDestination = destination) {
+                            composable("auth") {
+                                AuthScreen(onAuthorized = {
+                                    navController.navigate("main") {
+                                        popUpTo("auth") { inclusive = true }
+                                    }
+                                })
+                            }
+                            composable("main") {
+                                MainScreen()
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TomahawkSpaceTheme {
-        Greeting("Android")
     }
 }

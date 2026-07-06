@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tomahawk Space</string>
+    <string name="get_key_info">Ты можешь получить свой API ключ на сайте api.nasa.gov</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="invalid_key">Неверный формат API ключа</string>
+    <string name="api_key_label">Ключ NASA API</string>
+    <string name="btn_confirm">Подтвердить</string>
+    <string name="error_invalid_key">Неверный формат API ключа или ключ был отклонён</string>
+    <string name="nav_general">Главная</string>
+    <string name="nav_gallery">Галерея</string>
+    <string name="nav_settings">Настройки</string>
+</resources>
