@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Tomahawk Space</string>
+
+    <!-- auth screen -->
+    <string name="get_key_info">You can get your API key at api.nasa.gov</string>
+    <string name="confirm">Confirm</string>
+    <string name="invalid_key">Invalid API Key format</string>
+    <string name="api_key_label">NASA API Key</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="error_invalid_key">Invalid API Key format or key is rejected</string>
+    
+    <!-- main screen -->
+    <string name="nav_general">General</string>
+    <string name="nav_gallery">Gallery</string>
+    <string name="nav_settings">Settings</string>
 </resources>
