@@ -37,9 +37,8 @@ class MainViewModel(
                 } else {
                     _state.value = MainState.Error("No API key found")
                 }
-            } catch (e: Exception) {
-                // simple logging without long dashes or dots
-                _state.value = MainState.Error(e.message ?: "unknown error")
+            } catch (_: Exception) {
+                _state.value = MainState.Error("Failed to load the picture of the day")
             }
         }
     }
