@@ -157,14 +157,23 @@ fun ApodContent(apod: ApodResponse) {
             color = MaterialTheme.colorScheme.outline
         )
         Spacer(modifier = Modifier.height(16.dp))
-        AsyncImage(
-            model = apod.url,
-            contentDescription = apod.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.FillWidth
-        )
+        if (apod.mediaType == "image") {
+            AsyncImage(
+                model = apod.url,
+                contentDescription = apod.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.FillWidth
+            )
+        } else {
+            Text(
+                text = apod.url,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = apod.explanation,
