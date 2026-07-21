@@ -9,8 +9,13 @@
     <string name="btn_confirm">Confirm</string>
     <string name="error_invalid_key">Invalid API Key format or key is rejected</string>
     
-    <!-- main screen -->
+    <!-- navigation -->
     <string name="nav_general">General</string>
     <string name="nav_gallery">Gallery</string>
     <string name="nav_settings">Settings</string>
+
+    <!-- general screen -->
+    <string name="general_press_button">Press the button to load the picture of the day</string>
+    <string name="general_load">Load</string>
+    <string name="general_error_format">Error: %1$s</string>
 </resources>
