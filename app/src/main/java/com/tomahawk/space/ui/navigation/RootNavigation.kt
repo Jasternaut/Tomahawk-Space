@@ -85,10 +85,10 @@ fun RootNavigation(
                 MainScreen(viewModel)
             }
             composable(Screen.Gallery.route) {
-                PlaceholderScreen("Gallery")
+                PlaceholderScreen(stringResource(R.string.nav_gallery))
             }
             composable(Screen.Settings.route) {
-                PlaceholderScreen("Settings")
+                PlaceholderScreen(stringResource(R.string.nav_settings))
             }
         }
     }
@@ -97,6 +97,6 @@ fun RootNavigation(
 @Composable
 fun PlaceholderScreen(name: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "$name Screen (Coming Soon)")
+        Text(text = name)
     }
 }
