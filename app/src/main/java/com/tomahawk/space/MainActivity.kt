@@ -20,9 +20,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.tomahawk.space.data.ApodRepository
 import com.tomahawk.space.data.AuthRepository
+import com.tomahawk.space.ui.navigation.RootNavigation
 import com.tomahawk.space.ui.screens.auth.AuthScreen
-import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.theme.TomahawkSpaceTheme
 
 class MainActivity : ComponentActivity() {
@@ -53,12 +54,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val context = LocalContext.current
-                    val repository = remember { AuthRepository(context) }
+                    val authRepository = remember { AuthRepository(context) }
+                    val apodRepository = remember { ApodRepository() }
 
                     var startDestination by remember { mutableStateOf<String?>(null) }
 
                     LaunchedEffect(Unit) {
-                        val savedKey = repository.getKey()
+                        val savedKey = authRepository.getKey()
                         startDestination = if (savedKey != null) "main" else "auth"
                     }
 
@@ -72,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                 })
                             }
                             composable("main") {
-                                MainScreen()
+                                RootNavigation(authRepository, apodRepository)
                             }
                         }
                     }
