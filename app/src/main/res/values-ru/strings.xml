@@ -12,4 +12,5 @@
     <string name="nav_settings">Настройки</string>
     <string name="general_press_button">Нажми на кнопку, чтобы загрузить картинку дня</string>
     <string name="general_load">Загрузить</string>
+    <string name="general_error_format">Ошибка: %1$s</string>
 </resources>

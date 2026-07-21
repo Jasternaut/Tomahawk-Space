@@ -128,7 +128,7 @@ fun MainScreen(viewModel: MainViewModel) {
                             }
                             is MainState.Error -> {
                                 Text(
-                                    text = "Error: ${s.message}",
+                                    text = stringResource(R.string.general_error_format, s.message),
                                     color = MaterialTheme.colorScheme.error,
                                     textAlign = TextAlign.Center
                                 )

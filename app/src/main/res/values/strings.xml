@@ -17,4 +17,5 @@
     <!-- general screen -->
     <string name="general_press_button">Press the button to load the picture of the day</string>
     <string name="general_load">Load</string>
+    <string name="general_error_format">Error: %1$s</string>
 </resources>
