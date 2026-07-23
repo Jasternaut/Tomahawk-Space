@@ -14,6 +14,21 @@
     <string name="nav_gallery">Gallery</string>
     <string name="nav_settings">Settings</string>
 
+    <!-- settings screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_api_category">API Settings</string>
+    <string name="settings_current_key">Your current key</string>
+    <string name="settings_copy">Copy</string>
+    <string name="settings_edit">Edit</string>
+    <string name="settings_show">Show</string>
+    <string name="settings_hide">Hide</string>
+    <string name="settings_key_copied">Key copied to clipboard</string>
+    <string name="settings_edit_key_title">Edit API Key</string>
+    <string name="settings_api_info">The key is used to access NASA data. You can get it for free at api.nasa.gov.</string>
+    <string name="settings_key_setup">Key Setup</string>
+    <string name="settings_apply_changes">Apply changes</string>
+    <string name="settings_back">Back</string>
+
     <!-- general screen -->
     <string name="general_press_button">Press the button to load the picture of the day</string>
     <string name="general_load">Load</string>
