@@ -78,15 +78,20 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
 
         viewModelScope.launch {
             isUpdating = true
-            val isValid = repository.validateKey(keyToSave)
-            if (isValid) {
-                repository.saveKey(keyToSave)
-                apiKey = keyToSave
-                updateError = null
-            } else {
-                updateError = SettingsError.ValidationFailed
+            updateError = null
+            try {
+                val isValid = repository.validateKey(keyToSave)
+                if (isValid) {
+                    repository.saveKey(keyToSave)
+                    apiKey = keyToSave
+                    newKeyInput = keyToSave
+                    updateError = null
+                } else {
+                    updateError = SettingsError.ValidationFailed
+                }
+            } finally {
+                isUpdating = false
             }
-            isUpdating = false
         }
     }
 }
