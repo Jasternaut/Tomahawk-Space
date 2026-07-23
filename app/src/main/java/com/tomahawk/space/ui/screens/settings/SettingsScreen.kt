@@ -225,8 +225,10 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                                 IconButton(onClick = {
                                     scope.launch {
                                         val clipData = ClipData.newPlainText("NASA API Key", viewModel.apiKey)
-                                        clipData.description.extras = PersistableBundle().apply {
-                                            putBoolean("android.content.extra.IS_SENSITIVE", true)
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                            clipData.description.extras = PersistableBundle().apply {
+                                                putBoolean("android.content.extra.IS_SENSITIVE", true)
+                                            }
                                         }
                                         clipboard.setClipEntry(ClipEntry(clipData))
                                     }
