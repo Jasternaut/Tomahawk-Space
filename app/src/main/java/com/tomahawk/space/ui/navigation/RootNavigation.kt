@@ -30,6 +30,9 @@ import com.tomahawk.space.data.AuthRepository
 import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.screens.main.MainViewModel
 import com.tomahawk.space.ui.screens.main.MainViewModelFactory
+import com.tomahawk.space.ui.screens.settings.SettingsScreen
+import com.tomahawk.space.ui.screens.settings.SettingsViewModel
+import com.tomahawk.space.ui.screens.settings.SettingsViewModelFactory
 
 sealed class Screen(val route: String, val labelRes: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
     object General : Screen("general", R.string.nav_general, Icons.Default.Home)
@@ -88,7 +91,10 @@ fun RootNavigation(
                 PlaceholderScreen(stringResource(R.string.nav_gallery))
             }
             composable(Screen.Settings.route) {
-                PlaceholderScreen(stringResource(R.string.nav_settings))
+                val viewModel: SettingsViewModel = viewModel(
+                    factory = SettingsViewModelFactory(authRepository)
+                )
+                SettingsScreen(viewModel)
             }
         }
     }
