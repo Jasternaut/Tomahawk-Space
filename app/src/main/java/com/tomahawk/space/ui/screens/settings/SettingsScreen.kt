@@ -217,9 +217,15 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                         trailingContent = {
                             Row {
                                 IconButton(onClick = { viewModel.toggleKeyVisibility() }) {
+                                    val (icon, descriptionRes) = if (viewModel.isKeyVisible) {
+                                        Icons.Default.VisibilityOff to R.string.settings_hide
+                                    } else {
+                                        Icons.Default.Visibility to R.string.settings_show
+                                    }
+
                                     Icon(
-                                        imageVector = if (viewModel.isKeyVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                        contentDescription = null
+                                        imageVector = icon,
+                                        contentDescription = stringResource(descriptionRes)
                                     )
                                 }
                                 IconButton(onClick = {
