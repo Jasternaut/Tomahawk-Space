@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tomahawk Space</string>
+    <string name="get_key_info">Ты можешь получить свой API ключ на сайте api.nasa.gov</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="invalid_key">Неверный формат API ключа</string>
+    <string name="api_key_label">Ключ NASA API</string>
+    <string name="btn_confirm">Подтвердить</string>
+    <string name="error_invalid_key">Неверный формат API ключа или ключ был отклонён</string>
+    <string name="nav_general">Главная</string>
+    <string name="nav_gallery">Галерея</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- settings screen -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_api_category">Настройки API</string>
+    <string name="settings_current_key">Текущий ключ</string>
+    <string name="settings_copy">Копировать</string>
+    <string name="settings_edit">Изменить</string>
+    <string name="settings_show">Показать</string>
+    <string name="settings_hide">Скрыть</string>
+    <string name="settings_key_copied">Ключ скопирован в буфер обмена</string>
+    <string name="settings_edit_key_title">Изменить API ключ</string>
+    <string name="settings_api_info">Ключ используется для доступа к данным NASA. Вы можете получить его бесплатно на сайте api.nasa.gov.</string>
+    <string name="settings_key_setup">Настройка ключа</string>
+    <string name="settings_apply_changes">Применить изменения</string>
+    <string name="settings_error_validation_failed">Ошибка валидации ключа</string>
+    <string name="settings_back">Назад</string>
+    <string name="general_press_button">Нажми на кнопку, чтобы загрузить картинку дня</string>
+    <string name="general_load">Загрузить</string>
+    <string name="general_error_format">Ошибка: %1$s</string>
+</resources>
