@@ -27,6 +27,7 @@
     <string name="settings_api_info">The key is used to access NASA data. You can get it for free at api.nasa.gov.</string>
     <string name="settings_key_setup">Key Setup</string>
     <string name="settings_apply_changes">Apply changes</string>
+    <string name="settings_error_validation_failed">Key validation failed</string>
     <string name="settings_back">Back</string>
 
     <!-- general screen -->

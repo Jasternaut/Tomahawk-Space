@@ -24,6 +24,7 @@
     <string name="settings_api_info">Ключ используется для доступа к данным NASA. Вы можете получить его бесплатно на сайте api.nasa.gov.</string>
     <string name="settings_key_setup">Настройка ключа</string>
     <string name="settings_apply_changes">Применить изменения</string>
+    <string name="settings_error_validation_failed">Ошибка валидации ключа</string>
     <string name="settings_back">Назад</string>
     <string name="general_press_button">Нажми на кнопку, чтобы загрузить картинку дня</string>
     <string name="general_load">Загрузить</string>

@@ -14,6 +14,11 @@ sealed class SettingsNav {
     object ApiSettings : SettingsNav()
 }
 
+sealed class SettingsError {
+    object InvalidFormat : SettingsError()
+    object ValidationFailed : SettingsError()
+}
+
 class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var currentNav by mutableStateOf<SettingsNav>(SettingsNav.Main)
         private set
@@ -21,7 +26,15 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var apiKey by mutableStateOf("")
         private set
 
-    var newKeyInput by mutableStateOf("")
+    private var _newKeyInput by mutableStateOf("")
+    var newKeyInput: String
+        get() = _newKeyInput
+        set(value) {
+            _newKeyInput = value
+            if (updateError != null) {
+                updateError = null
+            }
+        }
 
     var isKeyVisible by mutableStateOf(false)
         private set
@@ -29,7 +42,7 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var isUpdating by mutableStateOf(false)
         private set
 
-    var updateError by mutableStateOf<String?>(null)
+    var updateError by mutableStateOf<SettingsError?>(null)
         private set
 
     init {
@@ -59,7 +72,7 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
         val keyToSave = newKeyInput.trim()
         val regex = Regex("^[a-zA-Z0-9]{40}$|^DEMO_KEY$")
         if (!regex.matches(keyToSave)) {
-            updateError = "Invalid key format"
+            updateError = SettingsError.InvalidFormat
             return
         }
 
@@ -71,7 +84,7 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
                 apiKey = keyToSave
                 updateError = null
             } else {
-                updateError = "Key validation failed"
+                updateError = SettingsError.ValidationFailed
             }
             isUpdating = false
         }

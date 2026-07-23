@@ -258,7 +258,15 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                     label = { Text(stringResource(R.string.api_key_label)) },
                     leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
                     isError = viewModel.updateError != null,
-                    supportingText = { viewModel.updateError?.let { Text(it) } },
+                    supportingText = {
+                        viewModel.updateError?.let { error ->
+                            val message = when (error) {
+                                is SettingsError.InvalidFormat -> stringResource(R.string.invalid_key)
+                                is SettingsError.ValidationFailed -> stringResource(R.string.settings_error_validation_failed)
+                            }
+                            Text(message)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     enabled = !viewModel.isUpdating
