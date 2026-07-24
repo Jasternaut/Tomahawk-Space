@@ -7,12 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.tomahawk.space.data.AuthRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-sealed class SettingsNav {
-    object Main : SettingsNav()
-    object ApiSettings : SettingsNav()
-}
 
 sealed class SettingsError {
     object InvalidFormat : SettingsError()
@@ -20,9 +18,6 @@ sealed class SettingsError {
 }
 
 class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
-    var currentNav by mutableStateOf<SettingsNav>(SettingsNav.Main)
-        private set
-
     var apiKey by mutableStateOf("")
         private set
 
@@ -45,6 +40,9 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var updateError by mutableStateOf<SettingsError?>(null)
         private set
 
+    val searchByDate: StateFlow<Boolean> = repository.searchByDate
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     init {
         loadKey()
     }
@@ -56,16 +54,14 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
-    fun navigateTo(nav: SettingsNav) {
-        currentNav = nav
-    }
-
-    fun goBack() {
-        currentNav = SettingsNav.Main
-    }
-
     fun toggleKeyVisibility() {
         isKeyVisible = !isKeyVisible
+    }
+
+    fun toggleSearchByDate(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setSearchByDate(enabled)
+        }
     }
 
     fun updateApiKey() {
