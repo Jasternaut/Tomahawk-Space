@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
                     val context = LocalContext.current
                     val authRepository = remember { AuthRepository(context) }
                     val apodRepository = remember { ApodRepository() }
+                    val galleryRepository = remember { com.tomahawk.space.data.GalleryRepository(context) }
 
                     var startDestination by remember { mutableStateOf<String?>(null) }
 
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
                                 })
                             }
                             composable("main") {
-                                RootNavigation(authRepository, apodRepository)
+                                RootNavigation(authRepository, apodRepository, galleryRepository)
                             }
                         }
                     }
