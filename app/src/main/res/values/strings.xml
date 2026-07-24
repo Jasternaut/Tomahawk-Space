@@ -29,9 +29,23 @@
     <string name="settings_apply_changes">Apply changes</string>
     <string name="settings_error_validation_failed">Key validation failed</string>
     <string name="settings_back">Back</string>
+    <string name="settings_search_by_date_desc">Selection of a specific day in the calendar</string>
 
     <!-- general screen -->
     <string name="general_press_button">Press the button to load the picture of the day</string>
     <string name="general_load">Load</string>
+    <string name="general_load_by_date">Load by date</string>
     <string name="general_error_format">Error: %1$s</string>
+
+    <!-- gallery & like -->
+    <string name="like_button_desc">Like picture</string>
+    <string name="unlike_button_desc">Unlike picture</string>
+    <string name="gallery_empty">No liked pictures yet</string>
+    <string name="gallery_sort_newest">Newest first</string>
+    <string name="gallery_sort_oldest">Oldest first</string>
+    <string name="gallery_sort">Sort</string>
+    <string name="gallery_detail_close">Close</string>
+    <string name="gallery_remove_like">Remove from favorites</string>
+    <string name="settings_load_params">Load parameters</string>
+    <string name="settings_search_by_date">Search by date</string>
 </resources>
