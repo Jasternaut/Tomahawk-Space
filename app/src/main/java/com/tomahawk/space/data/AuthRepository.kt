@@ -1,9 +1,11 @@
 package com.tomahawk.space.data
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import retrofit2.Retrofit
@@ -14,6 +16,7 @@ private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 
 class AuthRepository(private val context: Context) {
     private val apiKey = stringPreferencesKey("api_key")
+    private val searchByDateKey = booleanPreferencesKey("search_by_date")
 
     private val api = Retrofit.Builder()
         .baseUrl("https://api.nasa.gov/")
@@ -24,7 +27,7 @@ class AuthRepository(private val context: Context) {
         return try {
             val response = api.validateKey(key)
             response.isSuccessful
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -35,6 +38,12 @@ class AuthRepository(private val context: Context) {
 
     suspend fun getKey(): String? {
         return context.dataStore.data.map { it[apiKey] }.first()
+    }
+
+    val searchByDate: Flow<Boolean> = context.dataStore.data.map { it[searchByDateKey] ?: false }
+
+    suspend fun setSearchByDate(enabled: Boolean) {
+        context.dataStore.edit { it[searchByDateKey] = enabled }
     }
 
     interface NasaApi {

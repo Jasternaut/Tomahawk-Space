@@ -12,7 +12,7 @@ class ApodRepository {
         .build()
         .create(NasaApiService::class.java)
 
-    suspend fun getApod(apiKey: String): ApodResponse {
-        return api.getApod(apiKey)
+    suspend fun getApod(apiKey: String, date: String? = null): ApodResponse {
+        return api.getApod(apiKey, date)
     }
 }
