@@ -26,7 +26,22 @@
     <string name="settings_apply_changes">Применить изменения</string>
     <string name="settings_error_validation_failed">Ошибка валидации ключа</string>
     <string name="settings_back">Назад</string>
+    <string name="settings_load_params">Параметры загрузки</string>
+    <string name="settings_search_by_date">Искать по дате</string>
+    <string name="settings_search_by_date_desc">Выбор конкретного дня в календаре</string>
+
     <string name="general_press_button">Нажми на кнопку, чтобы загрузить картинку дня</string>
     <string name="general_load">Загрузить</string>
+    <string name="general_load_by_date">Загрузить по дате</string>
     <string name="general_error_format">Ошибка: %1$s</string>
+
+    <!-- gallery & like -->
+    <string name="like_button_desc">Поставить лайк</string>
+    <string name="unlike_button_desc">Убрать лайк</string>
+    <string name="gallery_empty">В галерее пока нет понравившихся картинок</string>
+    <string name="gallery_sort_newest">Сначала новые</string>
+    <string name="gallery_sort_oldest">Сначала старые</string>
+    <string name="gallery_sort">Сортировка</string>
+    <string name="gallery_detail_close">Закрыть</string>
+    <string name="gallery_remove_like">Удалить из избранного</string>
 </resources>

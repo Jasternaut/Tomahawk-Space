@@ -5,11 +5,6 @@ import android.content.ClipData
 import android.os.Build
 import android.os.PersistableBundle
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -33,74 +29,64 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tomahawk.space.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel) {
-    val currentNav = viewModel.currentNav
-
-    BackHandler(enabled = currentNav != SettingsNav.Main) {
-        viewModel.goBack()
-    }
-
+fun SettingsMainScreen(
+    onNavigateToApi: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (currentNav == SettingsNav.Main) R.string.settings_title else R.string.settings_api_category
-                        )
-                    )
-                },
-                navigationIcon = {
-                    if (currentNav != SettingsNav.Main) {
-                        IconButton(onClick = { viewModel.goBack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.settings_back))
-                        }
-                    }
-                }
+                title = { Text(stringResource(R.string.settings_title)) }
             )
         }
     ) { padding ->
-        AnimatedContent(
-            targetState = currentNav,
-            transitionSpec = {
-                if (targetState != SettingsNav.Main) {
-                    slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
-                } else {
-                    slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                SettingsGroup {
+                    SettingsMenuItem(
+                        title = stringResource(R.string.settings_api_category),
+                        icon = Icons.Default.Key,
+                        onClick = onNavigateToApi
+                    )
                 }
-            },
-            modifier = Modifier.padding(padding),
-            label = "SettingsNav"
-        ) { navState ->
-            when (navState) {
-                is SettingsNav.Main -> SettingsMainScreen(viewModel)
-                is SettingsNav.ApiSettings -> ApiSettingsScreen(viewModel)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsMainScreen(viewModel: SettingsViewModel) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            SettingsGroup {
-                SettingsMenuItem(
-                    title = stringResource(R.string.settings_api_category),
-                    icon = Icons.Default.Key,
-                    onClick = { viewModel.navigateTo(SettingsNav.ApiSettings) }
-                )
-            }
+fun ApiSettingsScreen(
+    viewModel: SettingsViewModel,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings_api_category)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.settings_back)
+                        )
+                    }
+                }
+            )
         }
+    ) { padding ->
+        ApiSettingsContent(viewModel, modifier = Modifier.padding(padding))
     }
 }
 
@@ -124,20 +110,7 @@ fun SettingsMenuItem(
     ListItem(
         headlineContent = { Text(title) },
         leadingContent = {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            SettingsIcon(icon = icon)
         },
         trailingContent = {
             Icon(Icons.Default.ChevronRight, contentDescription = null)
@@ -147,15 +120,59 @@ fun SettingsMenuItem(
     )
 }
 
+@Composable
+fun SettingsSwitchItem(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(description) },
+        leadingContent = {
+            SettingsIcon(icon = icon)
+        },
+        trailingContent = {
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        },
+        modifier = Modifier.clickable { onCheckedChange(!checked) },
+        colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
+    )
+}
+
+@Composable
+fun SettingsIcon(icon: ImageVector) {
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun ApiSettingsScreen(viewModel: SettingsViewModel) {
+fun ApiSettingsContent(
+    viewModel: SettingsViewModel,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
+    val searchByDate by viewModel.searchByDate.collectAsStateWithLifecycle()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
@@ -196,16 +213,21 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 8.dp)
                 )
-                
-                // Current Key Card
-                Card(
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+
+                SettingsGroup {
+                    // Current Key Card
                     ListItem(
-                        headlineContent = { Text(stringResource(R.string.settings_current_key), style = MaterialTheme.typography.labelMedium) },
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.settings_current_key),
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                        },
                         supportingContent = {
-                            val displayKey = if (viewModel.apiKey.isBlank()) "—" else if (viewModel.isKeyVisible) viewModel.apiKey else "•".repeat(viewModel.apiKey.length.coerceAtMost(20))
+                            val displayKey =
+                                if (viewModel.apiKey.isBlank()) "—" else if (viewModel.isKeyVisible) viewModel.apiKey else "•".repeat(
+                                    viewModel.apiKey.length.coerceAtMost(20)
+                                )
                             Text(
                                 text = displayKey,
                                 fontFamily = FontFamily.Monospace,
@@ -230,7 +252,8 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                                 }
                                 IconButton(onClick = {
                                     scope.launch {
-                                        val clipData = ClipData.newPlainText("NASA API Key", viewModel.apiKey)
+                                        val clipData =
+                                            ClipData.newPlainText("NASA API Key", viewModel.apiKey)
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                             clipData.description.extras = PersistableBundle().apply {
                                                 putBoolean("android.content.extra.IS_SENSITIVE", true)
@@ -239,52 +262,89 @@ fun ApiSettingsScreen(viewModel: SettingsViewModel) {
                                         clipboard.setClipEntry(ClipEntry(clipData))
                                     }
                                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                                        Toast.makeText(context, context.getString(R.string.settings_key_copied), Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.settings_key_copied),
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }) {
                                     Icon(Icons.Default.ContentCopy, contentDescription = null)
                                 }
                             }
-                        }
+                        },
+                        colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
                     )
-                }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
 
-                // Input Section
-                OutlinedTextField(
-                    value = viewModel.newKeyInput,
-                    onValueChange = { viewModel.newKeyInput = it },
-                    label = { Text(stringResource(R.string.api_key_label)) },
-                    leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
-                    isError = viewModel.updateError != null,
-                    supportingText = {
-                        viewModel.updateError?.let { error ->
-                            val message = when (error) {
-                                is SettingsError.InvalidFormat -> stringResource(R.string.invalid_key)
-                                is SettingsError.ValidationFailed -> stringResource(R.string.settings_error_validation_failed)
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = viewModel.newKeyInput,
+                            onValueChange = { viewModel.newKeyInput = it },
+                            label = { Text(stringResource(R.string.api_key_label)) },
+                            leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
+                            isError = viewModel.updateError != null,
+                            supportingText = {
+                                viewModel.updateError?.let { error ->
+                                    val message = when (error) {
+                                        is SettingsError.InvalidFormat -> stringResource(R.string.invalid_key)
+                                        is SettingsError.ValidationFailed -> stringResource(R.string.settings_error_validation_failed)
+                                    }
+                                    Text(message)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            enabled = !viewModel.isUpdating
+                        )
+
+                        Button(
+                            onClick = { viewModel.updateApiKey() },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            enabled = !viewModel.isUpdating && viewModel.newKeyInput.isNotBlank()
+                        ) {
+                            if (viewModel.isUpdating) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            } else {
+                                Text(stringResource(R.string.settings_apply_changes))
                             }
-                            Text(message)
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    enabled = !viewModel.isUpdating
+                    }
+                }
+            }
+        }
+
+        // Parameters Section
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.settings_load_params),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 8.dp)
                 )
 
-                Button(
-                    onClick = { viewModel.updateApiKey() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    enabled = !viewModel.isUpdating && viewModel.newKeyInput.isNotBlank()
-                ) {
-                    if (viewModel.isUpdating) {
-                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
-                    } else {
-                        Text(stringResource(R.string.settings_apply_changes))
-                    }
+                SettingsGroup {
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.settings_search_by_date),
+                        description = stringResource(R.string.settings_search_by_date_desc),
+                        icon = Icons.Default.CalendarToday,
+                        checked = searchByDate,
+                        onCheckedChange = { viewModel.toggleSearchByDate(it) }
+                    )
                 }
             }
         }
