@@ -1,6 +1,9 @@
 package com.tomahawk.space
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AccelerateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -17,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.animation.doOnEnd
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -28,7 +33,43 @@ import com.tomahawk.space.ui.theme.TomahawkSpaceTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val scaleX = ObjectAnimator.ofFloat(
+                splashScreenView.iconView,
+                View.SCALE_X,
+                1f,
+                1.4f
+            )
+            val scaleY = ObjectAnimator.ofFloat(
+                splashScreenView.iconView,
+                View.SCALE_Y,
+                1f,
+                1.4f
+            )
+            val alpha = ObjectAnimator.ofFloat(
+                splashScreenView.view,
+                View.ALPHA,
+                1f,
+                0f
+            )
+
+            scaleX.duration = 400L
+            scaleY.duration = 400L
+            alpha.duration = 400L
+
+            scaleX.interpolator = AccelerateInterpolator()
+            scaleY.interpolator = AccelerateInterpolator()
+
+            scaleX.doOnEnd { splashScreenView.remove() }
+
+            scaleX.start()
+            scaleY.start()
+            alpha.start()
+        }
+
         enableEdgeToEdge()
         setContent {
             val darkTheme = isSystemInDarkTheme()
