@@ -2,6 +2,7 @@ package com.tomahawk.space.ui.screens.gallery
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -18,14 +20,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Hd
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -121,7 +117,26 @@ fun GalleryDetailScreen(
                             contentScale = ContentScale.FillWidth
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        ResolutionBadge(isHighRes = isHighRes)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            ResolutionBadge(isHighRes = isHighRes)
+                            if (item.hdUrl.isNullOrEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                TextButton(
+                                    onClick = { viewModel.refreshApodMetadata() },
+                                    enabled = !viewModel.isRefreshing,
+                                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+                                    modifier = Modifier.height(32.dp)
+                                ) {
+                                    if (viewModel.isRefreshing) {
+                                        CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(stringResource(R.string.gallery_refresh_metadata), style = MaterialTheme.typography.labelMedium)
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else {
                     Text(

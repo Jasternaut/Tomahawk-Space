@@ -26,12 +26,6 @@ class GalleryRepository(private val context: Context) {
         }
     }
 
-    fun isLiked(date: String): Flow<Boolean> {
-        return likedApods.map { list ->
-            list.any { it.date == date }
-        }
-    }
-
     suspend fun toggleLike(apod: ApodResponse) {
         context.galleryDataStore.edit { prefs ->
             val json = prefs[likedApodsKey]
@@ -54,6 +48,24 @@ class GalleryRepository(private val context: Context) {
             }
 
             prefs[likedApodsKey] = gson.toJson(currentList)
+        }
+    }
+
+    suspend fun updateApod(updatedApod: ApodResponse) {
+        context.galleryDataStore.edit { prefs ->
+            val json = prefs[likedApodsKey] ?: return@edit
+            val type = object : TypeToken<List<ApodResponse>>() {}.type
+            val currentList: MutableList<ApodResponse> = try {
+                gson.fromJson(json, type) ?: mutableListOf()
+            } catch (_: Exception) {
+                mutableListOf()
+            }
+
+            val index = currentList.indexOfFirst { it.date == updatedApod.date }
+            if (index >= 0) {
+                currentList[index] = updatedApod
+                prefs[likedApodsKey] = gson.toJson(currentList)
+            }
         }
     }
 

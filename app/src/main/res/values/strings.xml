@@ -52,4 +52,5 @@
     <string name="settings_high_res_desc">Load high resolution images if available</string>
     <string name="resolution_standard">Standard Resolution</string>
     <string name="resolution_high">High Resolution</string>
+    <string name="gallery_refresh_metadata">Check for HD quality</string>
 </resources>
