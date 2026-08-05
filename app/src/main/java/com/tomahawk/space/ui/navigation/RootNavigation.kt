@@ -1,23 +1,35 @@
 package com.tomahawk.space.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -41,6 +53,7 @@ import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.screens.main.MainViewModel
 import com.tomahawk.space.ui.screens.main.MainViewModelFactory
 import com.tomahawk.space.ui.screens.settings.ApiSettingsScreen
+import com.tomahawk.space.ui.screens.settings.GeneralSettingsScreen
 import com.tomahawk.space.ui.screens.settings.SettingsMainScreen
 import com.tomahawk.space.ui.screens.settings.SettingsViewModel
 import com.tomahawk.space.ui.screens.settings.SettingsViewModelFactory
@@ -92,101 +105,231 @@ fun RootNavigation(
             }
         }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.General.route,
-            modifier = Modifier.padding(innerPadding)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
         ) {
-            composable(Screen.General.route) {
-                val viewModel: MainViewModel = viewModel(
-                    factory = MainViewModelFactory(authRepository, apodRepository, galleryRepository)
-                )
-                MainScreen(viewModel)
-            }
-            composable(Screen.Gallery.route) {
-                val viewModel: GalleryViewModel = viewModel(
-                    factory = GalleryViewModelFactory(galleryRepository)
-                )
-                GalleryScreen(
-                    viewModel = viewModel,
-                    onNavigateToDetail = { date ->
-                        navController.navigate("gallery_detail/$date")
-                    }
-                )
-            }
-            composable(
-                route = "gallery_detail/{date}",
-                arguments = listOf(navArgument("date") { type = NavType.StringType }),
+            NavHost(
+                navController = navController,
+                startDestination = Screen.General.route,
                 enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                        animationSpec = tween(400)
-                    ) + fadeIn(animationSpec = tween(400))
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> -fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 },
                 exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.End,
-                        animationSpec = tween(400)
-                    ) + fadeOut(animationSpec = tween(400))
-                },
-                popEnterTransition = {
-                    fadeIn(animationSpec = tween(400))
-                },
-                popExitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.End,
-                        animationSpec = tween(400)
-                    ) + fadeOut(animationSpec = tween(400))
-                }
-            ) { backStackEntry ->
-                val date = backStackEntry.arguments?.getString("date") ?: ""
-                val viewModel: GalleryDetailViewModel = viewModel(
-                    factory = GalleryDetailViewModelFactory(date, galleryRepository)
-                )
-                GalleryDetailScreen(
-                    viewModel = viewModel,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-            composable(Screen.Settings.route) {
-                SettingsMainScreen(
-                    onNavigateToApi = {
-                        navController.navigate("settings_api")
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            scaleOut(
+                                targetScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> -fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            scaleOut(
+                                targetScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        scaleOut(
+                            targetScale = 0.88f,
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        ) + slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -fullWidth / 6 },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
                     }
-                )
-            }
-            composable(
-                route = "settings_api",
-                enterTransition = {
-                    slideIntoContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                        animationSpec = tween(400)
-                    ) + fadeIn(animationSpec = tween(400))
-                },
-                exitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.End,
-                        animationSpec = tween(400)
-                    ) + fadeOut(animationSpec = tween(400))
                 },
                 popEnterTransition = {
-                    fadeIn(animationSpec = tween(400))
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            scaleIn(
+                                initialScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideInHorizontally(
+                                initialOffsetX = { fullWidth -> fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            scaleIn(
+                                initialScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideInHorizontally(
+                                initialOffsetX = { fullWidth -> -fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        scaleIn(
+                            initialScale = 0.88f,
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        ) + slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -fullWidth / 6 },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 },
                 popExitTransition = {
-                    slideOutOfContainer(
-                        towards = AnimatedContentTransitionScope.SlideDirection.End,
-                        animationSpec = tween(400)
-                    ) + fadeOut(animationSpec = tween(400))
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> -fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 }
             ) {
-                val viewModel: SettingsViewModel = viewModel(
-                    factory = SettingsViewModelFactory(authRepository)
-                )
-                ApiSettingsScreen(
-                    viewModel = viewModel,
-                    onBack = { navController.popBackStack() }
-                )
+                composable(Screen.General.route) {
+                    AnimatedCardWrapper {
+                        val viewModel: MainViewModel = viewModel(
+                            factory = MainViewModelFactory(authRepository, apodRepository, galleryRepository)
+                        )
+                        MainScreen(viewModel)
+                    }
+                }
+                composable(Screen.Gallery.route) {
+                    AnimatedCardWrapper {
+                        val viewModel: GalleryViewModel = viewModel(
+                            factory = GalleryViewModelFactory(galleryRepository)
+                        )
+                        GalleryScreen(
+                            viewModel = viewModel,
+                            onNavigateToDetail = { date ->
+                                navController.navigate("gallery_detail/$date")
+                            }
+                        )
+                    }
+                }
+                composable(
+                    route = "gallery_detail/{date}",
+                    arguments = listOf(navArgument("date") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    AnimatedCardWrapper {
+                        val date = backStackEntry.arguments?.getString("date") ?: ""
+                        val viewModel: GalleryDetailViewModel = viewModel(
+                            factory = GalleryDetailViewModelFactory(date, galleryRepository, apodRepository, authRepository)
+                        )
+                        GalleryDetailScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+                composable(Screen.Settings.route) {
+                    AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
+                        SettingsMainScreen(
+                            viewModel = viewModel,
+                            onNavigateToGeneral = {
+                                navController.navigate("settings_general")
+                            },
+                            onNavigateToApi = {
+                                navController.navigate("settings_api")
+                            }
+                        )
+                    }
+                }
+                composable(
+                    route = "settings_general"
+                ) {
+                    AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
+                        GeneralSettingsScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+                composable(
+                    route = "settings_api"
+                ) {
+                    AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
+                        ApiSettingsScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun AnimatedContentScope.AnimatedCardWrapper(
+    content: @Composable () -> Unit
+) {
+    val isAnimating = transition.isRunning
+    val targetRadius = if (isAnimating) 20.dp else 0.dp
+
+    val animatedRadius by animateDpAsState(
+        targetValue = targetRadius,
+        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
+        label = "cardCornerAnimation"
+    )
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer {
+                shape = RoundedCornerShape(animatedRadius)
+                clip = true
+            },
+        color = MaterialTheme.colorScheme.background
+    ) {
+        content()
     }
 }

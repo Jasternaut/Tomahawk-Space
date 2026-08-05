@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,28 +75,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkTheme = isSystemInDarkTheme()
 
-            DisposableEffect(darkTheme) {
+            val context = LocalContext.current
+            val authRepository = remember { AuthRepository(context) }
+            val appTheme by authRepository.appTheme.collectAsState(initial = 0)
+            val dynamicColors by authRepository.dynamicColors.collectAsState(initial = true)
+
+            val actualDarkTheme = when (appTheme) {
+                1 -> false
+                2 -> true
+                else -> darkTheme
+            }
+
+            DisposableEffect(actualDarkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(
                         android.graphics.Color.TRANSPARENT,
                         android.graphics.Color.TRANSPARENT,
-                    ) { darkTheme },
+                    ) { actualDarkTheme },
                     navigationBarStyle = SystemBarStyle.auto(
                         android.graphics.Color.TRANSPARENT,
                         android.graphics.Color.TRANSPARENT,
-                    ) { darkTheme }
+                    ) { actualDarkTheme }
                 )
                 onDispose {}
             }
 
-            TomahawkSpaceTheme(darkTheme = darkTheme) {
+            TomahawkSpaceTheme(
+                appTheme = appTheme,
+                dynamicColor = dynamicColors
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val context = LocalContext.current
-                    val authRepository = remember { AuthRepository(context) }
                     val apodRepository = remember { ApodRepository() }
                     val galleryRepository = remember { com.tomahawk.space.data.GalleryRepository(context) }
 

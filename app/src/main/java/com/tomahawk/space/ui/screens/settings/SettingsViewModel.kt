@@ -34,6 +34,9 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var isKeyVisible by mutableStateOf(false)
         private set
 
+    var isNewKeyVisible by mutableStateOf(false)
+        private set
+
     var isUpdating by mutableStateOf(false)
         private set
 
@@ -41,6 +44,18 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
         private set
 
     val searchByDate: StateFlow<Boolean> = repository.searchByDate
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val highResImages: StateFlow<Boolean> = repository.highResImages
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val appTheme: StateFlow<Int> = repository.appTheme
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+
+    val dynamicColors: StateFlow<Boolean> = repository.dynamicColors
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val hideDividers: StateFlow<Boolean> = repository.hideDividers
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     init {
@@ -58,9 +73,37 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
         isKeyVisible = !isKeyVisible
     }
 
+    fun toggleNewKeyVisibility() {
+        isNewKeyVisible = !isNewKeyVisible
+    }
+
     fun toggleSearchByDate(enabled: Boolean) {
         viewModelScope.launch {
             repository.setSearchByDate(enabled)
+        }
+    }
+
+    fun toggleHighResImages(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setHighResImages(enabled)
+        }
+    }
+
+    fun setAppTheme(theme: Int) {
+        viewModelScope.launch {
+            repository.setAppTheme(theme)
+        }
+    }
+
+    fun toggleDynamicColors(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setDynamicColors(enabled)
+        }
+    }
+
+    fun toggleHideDividers(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setHideDividers(enabled)
         }
     }
 
