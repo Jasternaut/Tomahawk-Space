@@ -1,24 +1,30 @@
 package com.tomahawk.space.ui.screens.gallery
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Hd
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -103,15 +109,20 @@ fun GalleryDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 if (item.mediaType == "image") {
-                    val imageUrl = if (highResImages && !item.hdUrl.isNullOrEmpty()) item.hdUrl else item.url
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = item.title,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp)),
-                        contentScale = ContentScale.FillWidth
-                    )
+                    val isHighRes = highResImages && !item.hdUrl.isNullOrEmpty()
+                    val imageUrl = if (isHighRes) item.hdUrl else item.url
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        AsyncImage(
+                            model = imageUrl,
+                            contentDescription = item.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp)),
+                            contentScale = ContentScale.FillWidth
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ResolutionBadge(isHighRes = isHighRes)
+                    }
                 } else {
                     Text(
                         text = item.url,
@@ -127,6 +138,33 @@ fun GalleryDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun ResolutionBadge(isHighRes: Boolean, modifier: Modifier = Modifier) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = if (isHighRes) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = if (isHighRes) Icons.Default.Hd else Icons.Default.Image,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = if (isHighRes) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Text(
+                text = stringResource(if (isHighRes) R.string.resolution_high else R.string.resolution_standard),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isHighRes) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }

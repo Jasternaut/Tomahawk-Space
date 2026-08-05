@@ -50,4 +50,6 @@
     <string name="settings_search_by_date">Search by date</string>
     <string name="settings_high_res">High Resolution Images</string>
     <string name="settings_high_res_desc">Load high resolution images if available</string>
+    <string name="resolution_standard">Standard Resolution</string>
+    <string name="resolution_high">High Resolution</string>
 </resources>

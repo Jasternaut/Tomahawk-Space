@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Hd
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -238,15 +241,20 @@ fun ApodContent(apod: ApodResponse, useHighRes: Boolean = false) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         if (apod.mediaType == "image") {
-            val imageUrl = if (useHighRes && !apod.hdUrl.isNullOrEmpty()) apod.hdUrl else apod.url
-            AsyncImage(
-                model = imageUrl,
-                contentDescription = apod.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.FillWidth
-            )
+            val isHighRes = useHighRes && !apod.hdUrl.isNullOrEmpty()
+            val imageUrl = if (isHighRes) apod.hdUrl else apod.url
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = apod.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp)),
+                    contentScale = ContentScale.FillWidth
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                ResolutionBadge(isHighRes = isHighRes)
+            }
         } else {
             Text(
                 text = apod.url,
@@ -262,5 +270,32 @@ fun ApodContent(apod: ApodResponse, useHighRes: Boolean = false) {
         )
         // extra space for fab
         Spacer(modifier = Modifier.height(80.dp))
+    }
+}
+
+@Composable
+fun ResolutionBadge(isHighRes: Boolean, modifier: Modifier = Modifier) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = if (isHighRes) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Icon(
+                imageVector = if (isHighRes) Icons.Default.Hd else Icons.Default.Image,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+                tint = if (isHighRes) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer
+            )
+            Text(
+                text = stringResource(if (isHighRes) R.string.resolution_high else R.string.resolution_standard),
+                style = MaterialTheme.typography.labelMedium,
+                color = if (isHighRes) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
     }
 }
