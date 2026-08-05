@@ -16,7 +16,10 @@
 
     <!-- settings screen -->
     <string name="settings_title">Settings</string>
-    <string name="settings_api_category">API Settings</string>
+    <string name="settings_general_category">General</string>
+    <string name="settings_general_category_desc">Appearance, colors and look</string>
+    <string name="settings_api_category">NASA API</string>
+    <string name="settings_api_category_desc">Access key and parameters</string>
     <string name="settings_current_key">Your current key</string>
     <string name="settings_copy">Copy</string>
     <string name="settings_edit">Edit</string>
@@ -48,4 +51,9 @@
     <string name="gallery_remove_like">Remove from favorites</string>
     <string name="settings_load_params">Load parameters</string>
     <string name="settings_search_by_date">Search by date</string>
+    <string name="settings_high_res">HD Images</string>
+    <string name="settings_high_res_desc">Load high resolution images if available</string>
+    <string name="resolution_standard">Standard Resolution</string>
+    <string name="resolution_high">High Resolution</string>
+    <string name="gallery_refresh_metadata">Check for HD quality</string>
 </resources>

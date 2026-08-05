@@ -37,6 +37,9 @@ class MainViewModel(
     val searchByDate: StateFlow<Boolean> = authRepository.searchByDate
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val highResImages: StateFlow<Boolean> = authRepository.highResImages
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     val isCurrentLiked: StateFlow<Boolean> = combine(_state, galleryRepository.likedApods) { state, likedList ->
         if (state is MainState.Success) {
             likedList.any { it.date == state.apod.date }

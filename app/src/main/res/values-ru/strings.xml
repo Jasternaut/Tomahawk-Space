@@ -13,7 +13,10 @@
 
     <!-- settings screen -->
     <string name="settings_title">Настройки</string>
-    <string name="settings_api_category">Настройки API</string>
+    <string name="settings_general_category">Общие</string>
+    <string name="settings_general_category_desc">Оформление, цвета и внешний вид</string>
+    <string name="settings_api_category">NASA API</string>
+    <string name="settings_api_category_desc">Ключ доступа и параметры</string>
     <string name="settings_current_key">Текущий ключ</string>
     <string name="settings_copy">Копировать</string>
     <string name="settings_edit">Изменить</string>
@@ -29,6 +32,11 @@
     <string name="settings_load_params">Параметры загрузки</string>
     <string name="settings_search_by_date">Искать по дате</string>
     <string name="settings_search_by_date_desc">Выбор конкретного дня в календаре</string>
+    <string name="settings_high_res">HD Картинки</string>
+    <string name="settings_high_res_desc">Загружать картинки в hd-качестве, если доступно</string>
+    <string name="resolution_standard">Обычное разрешение</string>
+    <string name="resolution_high">Высокое разрешение</string>
+    <string name="gallery_refresh_metadata">Проверить HD качество</string>
 
     <string name="general_press_button">Нажми на кнопку, чтобы загрузить картинку дня</string>
     <string name="general_load">Загрузить</string>
