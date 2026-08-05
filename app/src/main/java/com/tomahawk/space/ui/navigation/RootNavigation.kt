@@ -53,6 +53,7 @@ import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.screens.main.MainViewModel
 import com.tomahawk.space.ui.screens.main.MainViewModelFactory
 import com.tomahawk.space.ui.screens.settings.ApiSettingsScreen
+import com.tomahawk.space.ui.screens.settings.GeneralSettingsScreen
 import com.tomahawk.space.ui.screens.settings.SettingsMainScreen
 import com.tomahawk.space.ui.screens.settings.SettingsViewModel
 import com.tomahawk.space.ui.screens.settings.SettingsViewModelFactory
@@ -185,10 +186,30 @@ fun RootNavigation(
                 }
                 composable(Screen.Settings.route) {
                     AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
                         SettingsMainScreen(
+                            viewModel = viewModel,
+                            onNavigateToGeneral = {
+                                navController.navigate("settings_general")
+                            },
                             onNavigateToApi = {
                                 navController.navigate("settings_api")
                             }
+                        )
+                    }
+                }
+                composable(
+                    route = "settings_general"
+                ) {
+                    AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
+                        GeneralSettingsScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                 }

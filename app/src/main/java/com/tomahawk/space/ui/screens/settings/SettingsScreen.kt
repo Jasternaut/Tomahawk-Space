@@ -38,8 +38,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsMainScreen(
+    viewModel: SettingsViewModel,
+    onNavigateToGeneral: () -> Unit,
     onNavigateToApi: () -> Unit
 ) {
+    val hideDividers by viewModel.hideDividers.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -67,16 +71,18 @@ fun SettingsMainScreen(
 
                     SettingsGroup {
                         SettingsMenuItem(
-                            title = stringResource(R.string.settings_general_category),
-                            description = stringResource(R.string.settings_general_category_desc),
+                            title = stringResource(R.string.settings_appearance),
+                            description = stringResource(R.string.settings_appearance_desc),
                             icon = Icons.Default.Palette,
-                            onClick = { /* Not implemented */ }
+                            onClick = onNavigateToGeneral
                         )
-                        HorizontalDivider(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                        )
+                        if (!hideDividers) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
+                        }
                         SettingsMenuItem(
                             title = stringResource(R.string.settings_api_category),
                             description = stringResource(R.string.settings_api_category_desc),
@@ -119,7 +125,7 @@ fun ApiSettingsScreen(
 fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.08f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth(), content = content)
@@ -135,12 +141,12 @@ fun SettingsMenuItem(
 ) {
     ListItem(
         headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
-        supportingContent = description?.let { { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)) } },
+        supportingContent = description?.let { { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)) } },
         leadingContent = {
             SettingsIcon(icon = icon)
         },
         trailingContent = {
-            Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+            Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
         },
         modifier = Modifier.clickable { onClick() },
         colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
@@ -157,7 +163,7 @@ fun SettingsSwitchItem(
 ) {
     ListItem(
         headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
-        supportingContent = { Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)) },
+        supportingContent = { Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)) },
         leadingContent = {
             SettingsIcon(icon = icon)
         },
@@ -182,13 +188,13 @@ fun SettingsIcon(icon: ImageVector) {
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+            .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+            tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(20.dp)
         )
     }
@@ -205,6 +211,7 @@ fun ApiSettingsContent(
     val scope = rememberCoroutineScope()
     val searchByDate by viewModel.searchByDate.collectAsStateWithLifecycle()
     val highResImages by viewModel.highResImages.collectAsStateWithLifecycle()
+    val hideDividers by viewModel.hideDividers.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -317,11 +324,13 @@ fun ApiSettingsContent(
                         colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
                     )
 
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                    )
+                    if (!hideDividers) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                        )
+                    }
 
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -403,11 +412,13 @@ fun ApiSettingsContent(
                         checked = searchByDate,
                         onCheckedChange = { viewModel.toggleSearchByDate(it) }
                     )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
-                    )
+                    if (!hideDividers) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                        )
+                    }
                     SettingsSwitchItem(
                         title = stringResource(R.string.settings_high_res),
                         description = stringResource(R.string.settings_high_res_desc),
