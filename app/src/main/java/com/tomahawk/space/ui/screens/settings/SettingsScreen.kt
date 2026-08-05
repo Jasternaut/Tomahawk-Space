@@ -27,6 +27,8 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -291,6 +293,21 @@ fun ApiSettingsContent(
                             onValueChange = { viewModel.newKeyInput = it },
                             label = { Text(stringResource(R.string.api_key_label)) },
                             leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
+                            trailingIcon = {
+                                IconButton(onClick = { viewModel.toggleNewKeyVisibility() }) {
+                                    val (icon, descriptionRes) = if (viewModel.isNewKeyVisible) {
+                                        Icons.Default.VisibilityOff to R.string.settings_hide
+                                    } else {
+                                        Icons.Default.Visibility to R.string.settings_show
+                                    }
+
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = stringResource(descriptionRes)
+                                    )
+                                }
+                            },
+                            visualTransformation = if (viewModel.isNewKeyVisible) VisualTransformation.None else PasswordVisualTransformation(),
                             isError = viewModel.updateError != null,
                             supportingText = {
                                 viewModel.updateError?.let { error ->

@@ -34,6 +34,9 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     var isKeyVisible by mutableStateOf(false)
         private set
 
+    var isNewKeyVisible by mutableStateOf(false)
+        private set
+
     var isUpdating by mutableStateOf(false)
         private set
 
@@ -56,6 +59,10 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun toggleKeyVisibility() {
         isKeyVisible = !isKeyVisible
+    }
+
+    fun toggleNewKeyVisibility() {
+        isNewKeyVisible = !isNewKeyVisible
     }
 
     fun toggleSearchByDate(enabled: Boolean) {
