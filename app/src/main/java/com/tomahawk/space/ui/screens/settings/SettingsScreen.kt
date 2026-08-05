@@ -42,8 +42,8 @@ fun SettingsMainScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.settings_title)) }
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.settings_title), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) }
             )
         }
     ) { padding ->
@@ -52,15 +52,38 @@ fun SettingsMainScreen(
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item { Spacer(modifier = Modifier.height(8.dp)) }
+
             item {
-                SettingsGroup {
-                    SettingsMenuItem(
-                        title = stringResource(R.string.settings_api_category),
-                        icon = Icons.Default.Key,
-                        onClick = onNavigateToApi
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.settings_general_category),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                        modifier = Modifier.padding(start = 8.dp)
                     )
+
+                    SettingsGroup {
+                        SettingsMenuItem(
+                            title = stringResource(R.string.settings_general_category),
+                            description = stringResource(R.string.settings_general_category_desc),
+                            icon = Icons.Default.Palette,
+                            onClick = { /* Not implemented */ }
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                        )
+                        SettingsMenuItem(
+                            title = stringResource(R.string.settings_api_category),
+                            description = stringResource(R.string.settings_api_category_desc),
+                            icon = Icons.Default.Key,
+                            onClick = onNavigateToApi
+                        )
+                    }
                 }
             }
         }
@@ -96,7 +119,7 @@ fun ApiSettingsScreen(
 fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
     Card(
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.fillMaxWidth(), content = content)
@@ -106,16 +129,18 @@ fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
 @Composable
 fun SettingsMenuItem(
     title: String,
+    description: String? = null,
     icon: ImageVector,
     onClick: () -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
+        headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
+        supportingContent = description?.let { { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)) } },
         leadingContent = {
             SettingsIcon(icon = icon)
         },
         trailingContent = {
-            Icon(Icons.Default.ChevronRight, contentDescription = null)
+            Icon(Icons.Default.ChevronRight, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
         },
         modifier = Modifier.clickable { onClick() },
         colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
@@ -131,13 +156,20 @@ fun SettingsSwitchItem(
     onCheckedChange: (Boolean) -> Unit
 ) {
     ListItem(
-        headlineContent = { Text(title) },
-        supportingContent = { Text(description) },
+        headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
+        supportingContent = { Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)) },
         leadingContent = {
             SettingsIcon(icon = icon)
         },
         trailingContent = {
-            Switch(checked = checked, onCheckedChange = onCheckedChange)
+            Switch(
+                checked = checked, 
+                onCheckedChange = onCheckedChange,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.primary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                )
+            )
         },
         modifier = Modifier.clickable { onCheckedChange(!checked) },
         colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent)
@@ -150,13 +182,13 @@ fun SettingsIcon(icon: ImageVector) {
         modifier = Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
             modifier = Modifier.size(20.dp)
         )
     }
@@ -179,11 +211,13 @@ fun ApiSettingsContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        item { Spacer(modifier = Modifier.height(8.dp)) }
+
         // Info Card
         item {
             Card(
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -193,16 +227,16 @@ fun ApiSettingsContent(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondaryContainer),
+                            .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                        Icon(Icons.Default.Info, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = stringResource(R.string.settings_api_info),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -210,10 +244,11 @@ fun ApiSettingsContent(
 
         // Key Setup Section
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = stringResource(R.string.settings_key_setup),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                     modifier = Modifier.padding(start = 8.dp)
                 )
 
@@ -223,7 +258,8 @@ fun ApiSettingsContent(
                         headlineContent = {
                             Text(
                                 stringResource(R.string.settings_current_key),
-                                style = MaterialTheme.typography.labelMedium
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                             )
                         },
                         supportingContent = {
@@ -234,6 +270,7 @@ fun ApiSettingsContent(
                             Text(
                                 text = displayKey,
                                 fontFamily = FontFamily.Monospace,
+                                style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.blur(if (viewModel.isKeyVisible) 0.dp else 8.dp),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -250,7 +287,8 @@ fun ApiSettingsContent(
 
                                     Icon(
                                         imageVector = icon,
-                                        contentDescription = stringResource(descriptionRes)
+                                        contentDescription = stringResource(descriptionRes),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                                 IconButton(onClick = {
@@ -272,7 +310,7 @@ fun ApiSettingsContent(
                                         ).show()
                                     }
                                 }) {
-                                    Icon(Icons.Default.ContentCopy, contentDescription = null)
+                                    Icon(Icons.Default.ContentCopy, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
                                 }
                             }
                         },
@@ -282,7 +320,7 @@ fun ApiSettingsContent(
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
                     )
 
                     Column(
@@ -293,7 +331,7 @@ fun ApiSettingsContent(
                             value = viewModel.newKeyInput,
                             onValueChange = { viewModel.newKeyInput = it },
                             label = { Text(stringResource(R.string.api_key_label)) },
-                            leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
+                            leadingIcon = { Icon(Icons.Default.Key, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
                             trailingIcon = {
                                 IconButton(onClick = { viewModel.toggleNewKeyVisibility() }) {
                                     val (icon, descriptionRes) = if (viewModel.isNewKeyVisible) {
@@ -304,7 +342,8 @@ fun ApiSettingsContent(
 
                                     Icon(
                                         imageVector = icon,
-                                        contentDescription = stringResource(descriptionRes)
+                                        contentDescription = stringResource(descriptionRes),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
                             },
@@ -348,10 +387,11 @@ fun ApiSettingsContent(
 
         // Parameters Section
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
                     text = stringResource(R.string.settings_load_params),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                     modifier = Modifier.padding(start = 8.dp)
                 )
 
@@ -366,7 +406,7 @@ fun ApiSettingsContent(
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
                     )
                     SettingsSwitchItem(
                         title = stringResource(R.string.settings_high_res),
@@ -378,5 +418,7 @@ fun ApiSettingsContent(
                 }
             }
         }
+
+        item { Spacer(modifier = Modifier.height(32.dp)) }
     }
 }
