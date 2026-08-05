@@ -175,7 +175,7 @@ fun RootNavigation(
                     AnimatedCardWrapper {
                         val date = backStackEntry.arguments?.getString("date") ?: ""
                         val viewModel: GalleryDetailViewModel = viewModel(
-                            factory = GalleryDetailViewModelFactory(date, galleryRepository)
+                            factory = GalleryDetailViewModelFactory(date, galleryRepository, authRepository)
                         )
                         GalleryDetailScreen(
                             viewModel = viewModel,

@@ -17,6 +17,7 @@ private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
 class AuthRepository(private val context: Context) {
     private val apiKey = stringPreferencesKey("api_key")
     private val searchByDateKey = booleanPreferencesKey("search_by_date")
+    private val highResKey = booleanPreferencesKey("high_res_images")
 
     private val api = Retrofit.Builder()
         .baseUrl("https://api.nasa.gov/")
@@ -44,6 +45,12 @@ class AuthRepository(private val context: Context) {
 
     suspend fun setSearchByDate(enabled: Boolean) {
         context.dataStore.edit { it[searchByDateKey] = enabled }
+    }
+
+    val highResImages: Flow<Boolean> = context.dataStore.data.map { it[highResKey] ?: false }
+
+    suspend fun setHighResImages(enabled: Boolean) {
+        context.dataStore.edit { it[highResKey] = enabled }
     }
 
     interface NasaApi {

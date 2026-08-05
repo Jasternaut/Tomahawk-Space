@@ -64,6 +64,7 @@ fun MainScreen(viewModel: MainViewModel) {
     val state by viewModel.state.collectAsState()
     val isLiked by viewModel.isCurrentLiked.collectAsState()
     val searchByDate by viewModel.searchByDate.collectAsState()
+    val highResImages by viewModel.highResImages.collectAsState()
     val isLoaded = state is MainState.Success
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -203,7 +204,7 @@ fun MainScreen(viewModel: MainViewModel) {
                                 )
                             }
                             is MainState.Success -> {
-                                ApodContent(s.apod)
+                                ApodContent(s.apod, highResImages)
                             }
                             is MainState.Error -> {
                                 Text(
@@ -222,7 +223,7 @@ fun MainScreen(viewModel: MainViewModel) {
 }
 
 @Composable
-fun ApodContent(apod: ApodResponse) {
+fun ApodContent(apod: ApodResponse, useHighRes: Boolean = false) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = apod.title,
@@ -237,8 +238,9 @@ fun ApodContent(apod: ApodResponse) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         if (apod.mediaType == "image") {
+            val imageUrl = if (useHighRes && !apod.hdUrl.isNullOrEmpty()) apod.hdUrl else apod.url
             AsyncImage(
-                model = apod.url,
+                model = imageUrl,
                 contentDescription = apod.title,
                 modifier = Modifier
                     .fillMaxWidth()

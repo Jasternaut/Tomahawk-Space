@@ -44,6 +44,7 @@ fun GalleryDetailScreen(
     onBack: () -> Unit
 ) {
     val apod by viewModel.apod.collectAsState()
+    val highResImages by viewModel.highResImages.collectAsState()
     var hasLoaded by remember { mutableStateOf(false) }
 
     // if apod becomes null after being loaded (removed from favorites), navigate back
@@ -102,8 +103,9 @@ fun GalleryDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 if (item.mediaType == "image") {
+                    val imageUrl = if (highResImages && !item.hdUrl.isNullOrEmpty()) item.hdUrl else item.url
                     AsyncImage(
-                        model = item.url,
+                        model = imageUrl,
                         contentDescription = item.title,
                         modifier = Modifier
                             .fillMaxWidth()

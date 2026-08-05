@@ -48,4 +48,6 @@
     <string name="gallery_remove_like">Remove from favorites</string>
     <string name="settings_load_params">Load parameters</string>
     <string name="settings_search_by_date">Search by date</string>
+    <string name="settings_high_res">High Resolution Images</string>
+    <string name="settings_high_res_desc">Load high resolution images if available</string>
 </resources>

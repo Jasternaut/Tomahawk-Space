@@ -46,6 +46,9 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     val searchByDate: StateFlow<Boolean> = repository.searchByDate
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val highResImages: StateFlow<Boolean> = repository.highResImages
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     init {
         loadKey()
     }
@@ -68,6 +71,12 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     fun toggleSearchByDate(enabled: Boolean) {
         viewModelScope.launch {
             repository.setSearchByDate(enabled)
+        }
+    }
+
+    fun toggleHighResImages(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setHighResImages(enabled)
         }
     }
 

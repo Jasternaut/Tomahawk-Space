@@ -172,6 +172,7 @@ fun ApiSettingsContent(
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     val searchByDate by viewModel.searchByDate.collectAsStateWithLifecycle()
+    val highResImages by viewModel.highResImages.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -361,6 +362,18 @@ fun ApiSettingsContent(
                         icon = Icons.Default.CalendarToday,
                         checked = searchByDate,
                         onCheckedChange = { viewModel.toggleSearchByDate(it) }
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                    SettingsSwitchItem(
+                        title = stringResource(R.string.settings_high_res),
+                        description = stringResource(R.string.settings_high_res_desc),
+                        icon = Icons.Default.Image,
+                        checked = highResImages,
+                        onCheckedChange = { viewModel.toggleHighResImages(it) }
                     )
                 }
             }
