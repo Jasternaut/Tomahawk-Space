@@ -3,6 +3,7 @@ package com.tomahawk.space.data
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,9 @@ class AuthRepository(private val context: Context) {
     private val apiKey = stringPreferencesKey("api_key")
     private val searchByDateKey = booleanPreferencesKey("search_by_date")
     private val highResKey = booleanPreferencesKey("high_res_images")
+    private val themeKey = intPreferencesKey("app_theme")
+    private val dynamicColorsKey = booleanPreferencesKey("dynamic_colors")
+    private val hideDividersKey = booleanPreferencesKey("hide_dividers")
 
     private val api = Retrofit.Builder()
         .baseUrl("https://api.nasa.gov/")
@@ -51,6 +55,24 @@ class AuthRepository(private val context: Context) {
 
     suspend fun setHighResImages(enabled: Boolean) {
         context.dataStore.edit { it[highResKey] = enabled }
+    }
+
+    val appTheme: Flow<Int> = context.dataStore.data.map { it[themeKey] ?: 0 }
+
+    suspend fun setAppTheme(theme: Int) {
+        context.dataStore.edit { it[themeKey] = theme }
+    }
+
+    val dynamicColors: Flow<Boolean> = context.dataStore.data.map { it[dynamicColorsKey] ?: true }
+
+    suspend fun setDynamicColors(enabled: Boolean) {
+        context.dataStore.edit { it[dynamicColorsKey] = enabled }
+    }
+
+    val hideDividers: Flow<Boolean> = context.dataStore.data.map { it[hideDividersKey] ?: false }
+
+    suspend fun setHideDividers(enabled: Boolean) {
+        context.dataStore.edit { it[hideDividersKey] = enabled }
     }
 
     interface NasaApi {

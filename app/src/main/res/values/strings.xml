@@ -32,6 +32,18 @@
     <string name="settings_apply_changes">Apply changes</string>
     <string name="settings_error_validation_failed">Key validation failed</string>
     <string name="settings_back">Back</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_desc">Theme and system settings</string>
+    <string name="settings_appearance_header">Appearance</string>
+    <string name="settings_system_header">System settings</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_dynamic_colors">Dynamic colors</string>
+    <string name="settings_dynamic_colors_desc">Colors based on wallpaper</string>
+    <string name="settings_hide_dividers">Hide dividers</string>
+    <string name="settings_hide_dividers_desc">Minimalist look of settings</string>
     <string name="settings_search_by_date_desc">Selection of a specific day in the calendar</string>
 
     <!-- general screen -->

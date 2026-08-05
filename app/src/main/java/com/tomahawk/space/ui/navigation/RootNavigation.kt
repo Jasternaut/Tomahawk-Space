@@ -53,6 +53,7 @@ import com.tomahawk.space.ui.screens.main.MainScreen
 import com.tomahawk.space.ui.screens.main.MainViewModel
 import com.tomahawk.space.ui.screens.main.MainViewModelFactory
 import com.tomahawk.space.ui.screens.settings.ApiSettingsScreen
+import com.tomahawk.space.ui.screens.settings.GeneralSettingsScreen
 import com.tomahawk.space.ui.screens.settings.SettingsMainScreen
 import com.tomahawk.space.ui.screens.settings.SettingsViewModel
 import com.tomahawk.space.ui.screens.settings.SettingsViewModelFactory
@@ -114,37 +115,114 @@ fun RootNavigation(
                 navController = navController,
                 startDestination = Screen.General.route,
                 enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { fullWidth -> fullWidth },
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    )
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            slideInHorizontally(
+                                initialOffsetX = { fullWidth -> -fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 },
                 exitTransition = {
-                    scaleOut(
-                        targetScale = 0.88f,
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    ) + slideOutHorizontally(
-                        targetOffsetX = { fullWidth -> -fullWidth / 6 },
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    )
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            scaleOut(
+                                targetScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> -fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            scaleOut(
+                                targetScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        scaleOut(
+                            targetScale = 0.88f,
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        ) + slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -fullWidth / 6 },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 },
                 popEnterTransition = {
-                    scaleIn(
-                        initialScale = 0.88f,
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    ) + slideInHorizontally(
-                        initialOffsetX = { fullWidth -> -fullWidth / 6 },
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    )
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            scaleIn(
+                                initialScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideInHorizontally(
+                                initialOffsetX = { fullWidth -> fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            scaleIn(
+                                initialScale = 0.88f,
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            ) + slideInHorizontally(
+                                initialOffsetX = { fullWidth -> -fullWidth / 6 },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        scaleIn(
+                            initialScale = 0.88f,
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        ) + slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -fullWidth / 6 },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 },
                 popExitTransition = {
-                    scaleOut(
-                        targetScale = 0.92f,
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    ) + slideOutHorizontally(
-                        targetOffsetX = { fullWidth -> fullWidth },
-                        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                    )
+                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
+                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+
+                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
+                        if (targetIndex > initialIndex) {
+                            slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> -fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        } else {
+                            slideOutHorizontally(
+                                targetOffsetX = { fullWidth -> fullWidth },
+                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            )
+                        }
+                    } else {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        )
+                    }
                 }
             ) {
                 composable(Screen.General.route) {
@@ -185,10 +263,30 @@ fun RootNavigation(
                 }
                 composable(Screen.Settings.route) {
                     AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
                         SettingsMainScreen(
+                            viewModel = viewModel,
+                            onNavigateToGeneral = {
+                                navController.navigate("settings_general")
+                            },
                             onNavigateToApi = {
                                 navController.navigate("settings_api")
                             }
+                        )
+                    }
+                }
+                composable(
+                    route = "settings_general"
+                ) {
+                    AnimatedCardWrapper {
+                        val viewModel: SettingsViewModel = viewModel(
+                            factory = SettingsViewModelFactory(authRepository)
+                        )
+                        GeneralSettingsScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
                         )
                     }
                 }
