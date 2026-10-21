@@ -1,0 +1,71 @@
+<resources>
+    <string name="app_name">Tomahawk Space</string>
+
+    <!-- auth screen -->
+    <string name="get_key_info">Вы можете получить ваш ключ API на сайте api.nasa.gov</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="invalid_key">Неверный формат ключа API</string>
+    <string name="api_key_label">Ключ NASA API</string>
+    <string name="btn_confirm">Подтвердить</string>
+    <string name="error_invalid_key">Неверный формат ключа API или ключ отклонён</string>
+
+    <!-- navigation -->
+    <string name="nav_general">Главная</string>
+    <string name="nav_gallery">Галерея</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- settings screen -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_general_category">Основные</string>
+    <string name="settings_general_category_desc">Внешний вид, цвета и оформление</string>
+    <string name="settings_api_category">NASA API</string>
+    <string name="settings_api_category_desc">Ключ доступа и параметры</string>
+    <string name="settings_current_key">Ваш текущий ключ</string>
+    <string name="settings_copy">Копировать</string>
+    <string name="settings_edit">Редактировать</string>
+    <string name="settings_show">Показать</string>
+    <string name="settings_hide">Скрыть</string>
+    <string name="settings_key_copied">Ключ скопирован в буфер обмена</string>
+    <string name="settings_edit_key_title">Редактировать ключ API</string>
+    <string name="settings_api_info">Ключ используется для доступа к данным NASA. Вы можете получить его бесплатно на api.nasa.gov.</string>
+    <string name="settings_key_setup">Настройка ключа</string>
+    <string name="settings_apply_changes">Применить изменения</string>
+    <string name="settings_error_validation_failed">Не удалось проверить ключ</string>
+    <string name="settings_back">Назад</string>
+    <string name="settings_appearance">Внешний вид</string>
+    <string name="settings_appearance_desc">Тема и системные настройки</string>
+    <string name="settings_appearance_header">Оформление</string>
+    <string name="settings_system_header">Системные настройки</string>
+    <string name="settings_theme_title">Тема оформления</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_dynamic_colors">Динамические цвета</string>
+    <string name="settings_dynamic_colors_desc">Цвета на основе обоев рабочего стола</string>
+    <string name="settings_hide_dividers">Скрыть разделители</string>
+    <string name="settings_hide_dividers_desc">Минималистичный вид настроек</string>
+    <string name="settings_search_by_date_desc">Выбор конкретного дня в календаре</string>
+
+    <!-- general screen -->
+    <string name="general_press_button">Нажмите кнопку, чтобы загрузить картинку дня</string>
+    <string name="general_load">Загрузить</string>
+    <string name="general_load_by_date">Загрузить по дате</string>
+    <string name="general_error_format">Ошибка: %1$s</string>
+
+    <!-- gallery & like -->
+    <string name="like_button_desc">Добавить в избранное</string>
+    <string name="unlike_button_desc">Удалить из избранного</string>
+    <string name="gallery_empty">Пока нет понравившихся картинок</string>
+    <string name="gallery_sort_newest">Сначала новые</string>
+    <string name="gallery_sort_oldest">Сначала старые</string>
+    <string name="gallery_sort">Сортировка</string>
+    <string name="gallery_detail_close">Закрыть</string>
+    <string name="gallery_remove_like">Удалить из избранного</string>
+    <string name="settings_load_params">Параметры загрузки</string>
+    <string name="settings_search_by_date">Поиск по дате</string>
+    <string name="settings_high_res">HD изображения</string>
+    <string name="settings_high_res_desc">Загружать изображения в высоком разрешении, если доступно</string>
+    <string name="resolution_standard">Обычное разрешение</string>
+    <string name="resolution_high">Высокое разрешение</string>
+    <string name="gallery_refresh_metadata">Проверить HD качество</string>
+</resources>
