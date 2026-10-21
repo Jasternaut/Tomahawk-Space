@@ -57,6 +57,9 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     val hideDividers: StateFlow<Boolean> = repository.hideDividers
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    val isFloatingNavBar: StateFlow<Boolean> = repository.isFloatingNavBar
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     init {
         loadKey()
     }
@@ -103,6 +106,12 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
     fun toggleHideDividers(enabled: Boolean) {
         viewModelScope.launch {
             repository.setHideDividers(enabled)
+        }
+    }
+
+    fun toggleFloatingNavBar(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.setFloatingNavBar(enabled)
         }
     }
 

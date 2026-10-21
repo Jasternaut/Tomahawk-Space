@@ -2,18 +2,21 @@ package com.tomahawk.space.ui.screens.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +26,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.ViewStream
@@ -36,6 +40,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -58,11 +63,14 @@ import tomahawkspace.shared.generated.resources.settings_appearance_header
 import tomahawkspace.shared.generated.resources.settings_back
 import tomahawkspace.shared.generated.resources.settings_dynamic_colors
 import tomahawkspace.shared.generated.resources.settings_dynamic_colors_desc
+import tomahawkspace.shared.generated.resources.settings_floating_nav_bar
+import tomahawkspace.shared.generated.resources.settings_floating_nav_bar_desc
 import tomahawkspace.shared.generated.resources.settings_hide_dividers
 import tomahawkspace.shared.generated.resources.settings_hide_dividers_desc
 import tomahawkspace.shared.generated.resources.settings_system_header
 import tomahawkspace.shared.generated.resources.settings_theme_dark
 import tomahawkspace.shared.generated.resources.settings_theme_light
+import tomahawkspace.shared.generated.resources.settings_theme_preview
 import tomahawkspace.shared.generated.resources.settings_theme_system
 import tomahawkspace.shared.generated.resources.settings_theme_title
 
@@ -75,6 +83,7 @@ fun GeneralSettingsScreen(
     val appTheme by viewModel.appTheme.collectAsState()
     val dynamicColors by viewModel.dynamicColors.collectAsState()
     val hideDividers by viewModel.hideDividers.collectAsState()
+    val isFloatingNavBar by viewModel.isFloatingNavBar.collectAsState()
 
     Scaffold(
         topBar = {
@@ -98,8 +107,19 @@ fun GeneralSettingsScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { Spacer(modifier = Modifier.height(8.dp)) }
+            item { Spacer(modifier = Modifier.height(4.dp)) }
 
+            // Theme Preview Card
+            item {
+                SettingsSection(title = stringResource(Res.string.settings_theme_preview)) {
+                    ThemeMiniPreviewCard(
+                        isFloatingBar = isFloatingNavBar,
+                        isPureBlack = appTheme == 2
+                    )
+                }
+            }
+
+            // Appearance Section
             item {
                 SettingsSection(title = stringResource(Res.string.settings_appearance_header)) {
                     ThemeSelectionCard(
@@ -110,9 +130,24 @@ fun GeneralSettingsScreen(
                 }
             }
 
+            // System & Navigation Settings Section
             item {
                 SettingsSection(title = stringResource(Res.string.settings_system_header)) {
                     SettingsGroup {
+                        SettingsSwitchItem(
+                            title = stringResource(Res.string.settings_floating_nav_bar),
+                            description = stringResource(Res.string.settings_floating_nav_bar_desc),
+                            icon = Icons.Default.Navigation,
+                            checked = isFloatingNavBar,
+                            onCheckedChange = { viewModel.toggleFloatingNavBar(it) }
+                        )
+                        if (!hideDividers) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
+                        }
                         SettingsSwitchItem(
                             title = stringResource(Res.string.settings_dynamic_colors),
                             description = stringResource(Res.string.settings_dynamic_colors_desc),
@@ -151,6 +186,125 @@ fun SettingsSection(title: String, content: @Composable () -> Unit) {
             modifier = Modifier.padding(start = 8.dp)
         )
         content()
+    }
+}
+
+@Composable
+fun ThemeMiniPreviewCard(isFloatingBar: Boolean, isPureBlack: Boolean) {
+    val bgColor = if (isPureBlack) Color.Black else MaterialTheme.colorScheme.surfaceContainerLowest
+
+    Card(
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                modifier = Modifier
+                    .width(190.dp)
+                    .height(220.dp),
+                shape = RoundedCornerShape(24.dp),
+                color = bgColor,
+                border = BorderStroke(4.dp, MaterialTheme.colorScheme.outlineVariant)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Mini card 1
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Box(modifier = Modifier.padding(8.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                                    .align(Alignment.CenterEnd)
+                            )
+                        }
+                    }
+
+                    // Mini card 2
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(36.dp),
+                        shape = RoundedCornerShape(10.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(14.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .width(26.dp)
+                                    .height(14.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary)
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.weight(1f))
+
+                    // Mini nav bar preview (changes shape dynamically)
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(28.dp)
+                            .padding(horizontal = if (isFloatingBar) 6.dp else 0.dp),
+                        shape = if (isFloatingBar) CircleShape else RoundedCornerShape(6.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            repeat(3) { index ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .clip(CircleShape)
+                                        .background(
+                                            if (index == 0) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                            }
+                                        )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

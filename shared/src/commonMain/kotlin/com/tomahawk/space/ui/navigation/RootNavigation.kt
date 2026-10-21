@@ -8,10 +8,23 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -26,11 +39,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -121,44 +138,39 @@ fun MainAppNavigation(
     galleryRepository: GalleryRepository
 ) {
     val navController = rememberNavController()
+    val isFloatingNavBar by authRepository.isFloatingNavBar.collectAsState(initial = true)
+
     val items = listOf(
         Screen.General,
         Screen.Gallery,
         Screen.Settings
     )
 
-    Scaffold(
-        bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-            val showBottomBar = currentDestination?.route in items.map { it.route }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = currentDestination?.route
+    val showNavBar = currentRoute in items.map { it.route }
 
-            if (showBottomBar) {
-                NavigationBar {
-                    items.forEach { screen ->
-                        NavigationBarItem(
-                            icon = { Icon(screen.icon, contentDescription = null) },
-                            label = { Text(stringResource(screen.labelRes)) },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        )
-                    }
+    val currentScreen = items.find { it.route == currentRoute } ?: Screen.General
+
+    TomahawkMainScaffold(
+        isFloatingNavBar = isFloatingNavBar,
+        showNavBar = showNavBar,
+        currentScreen = currentScreen,
+        items = items,
+        onScreenSelected = { screen ->
+            navController.navigate(screen.route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
                 }
+                launchSingleTop = true
+                restoreState = true
             }
         }
-    ) { innerPadding ->
+    ) { contentPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest)
         ) {
             NavHost(
@@ -280,7 +292,10 @@ fun MainAppNavigation(
                         val mainViewModel: MainViewModel = viewModel {
                             MainViewModel(authRepository, apodRepository, galleryRepository)
                         }
-                        MainScreen(mainViewModel)
+                        MainScreen(
+                            viewModel = mainViewModel,
+                            contentPadding = contentPadding
+                        )
                     }
                 }
                 composable(Screen.Gallery.route) {
@@ -346,6 +361,130 @@ fun MainAppNavigation(
                         ApiSettingsScreen(
                             viewModel = settingsViewModel,
                             onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TomahawkMainScaffold(
+    isFloatingNavBar: Boolean,
+    showNavBar: Boolean,
+    currentScreen: Screen,
+    items: List<Screen>,
+    onScreenSelected: (Screen) -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Scaffold(
+            bottomBar = {
+                if (showNavBar && !isFloatingNavBar) {
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ) {
+                        items.forEach { screen ->
+                            NavigationBarItem(
+                                selected = currentScreen == screen,
+                                onClick = { onScreenSelected(screen) },
+                                icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
+                                label = { Text(stringResource(screen.labelRes)) }
+                            )
+                        }
+                    }
+                }
+            }
+        ) { innerPadding ->
+            val contentPadding = if (showNavBar && isFloatingNavBar) {
+                PaddingValues(
+                    top = innerPadding.calculateTopPadding(),
+                    bottom = 104.dp
+                )
+            } else {
+                innerPadding
+            }
+
+            content(contentPadding)
+        }
+
+        if (showNavBar && isFloatingNavBar) {
+            FloatingNavigationCapsule(
+                currentScreen = currentScreen,
+                items = items,
+                onScreenSelected = onScreenSelected,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+                    .navigationBarsPadding()
+            )
+        }
+    }
+}
+
+@Composable
+fun FloatingNavigationCapsule(
+    currentScreen: Screen,
+    items: List<Screen>,
+    onScreenSelected: (Screen) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .height(68.dp)
+            .fillMaxWidth(),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
+        tonalElevation = 6.dp,
+        shadowElevation = 12.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            items.forEach { screen ->
+                val isSelected = currentScreen == screen
+                val pillColor = if (isSelected) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    Color.Transparent
+                }
+                val contentColor = if (isSelected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(0.82f)
+                        .clip(CircleShape)
+                        .background(pillColor)
+                        .clickable { onScreenSelected(screen) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = screen.icon,
+                            contentDescription = stringResource(screen.labelRes),
+                            tint = contentColor,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = stringResource(screen.labelRes),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = contentColor
                         )
                     }
                 }

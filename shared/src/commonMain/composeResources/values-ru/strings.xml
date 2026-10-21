@@ -45,12 +45,17 @@
     <string name="settings_hide_dividers">Скрыть разделители</string>
     <string name="settings_hide_dividers_desc">Минималистичный вид настроек</string>
     <string name="settings_search_by_date_desc">Выбор конкретного дня в календаре</string>
+    <string name="settings_floating_nav_bar">Парящая панель навигации</string>
+    <string name="settings_floating_nav_bar_desc">Панель навигации в виде капсулы в стиле FlClash</string>
+    <string name="settings_theme_preview">Превью оформления</string>
 
     <!-- general screen -->
     <string name="general_press_button">Нажмите кнопку, чтобы загрузить картинку дня</string>
     <string name="general_load">Загрузить</string>
     <string name="general_load_by_date">Загрузить по дате</string>
     <string name="general_error_format">Ошибка: %1$s</string>
+    <string name="bento_description_title">Описание</string>
+    <string name="bento_load_hd">Загрузить HD</string>
 
     <!-- gallery & like -->
     <string name="like_button_desc">Добавить в избранное</string>

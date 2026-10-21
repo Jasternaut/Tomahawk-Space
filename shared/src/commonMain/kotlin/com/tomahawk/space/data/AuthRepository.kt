@@ -22,6 +22,7 @@ class AuthRepository(
     private val themeKey = intPreferencesKey("app_theme")
     private val dynamicColorsKey = booleanPreferencesKey("dynamic_colors")
     private val hideDividersKey = booleanPreferencesKey("hide_dividers")
+    private val floatingNavBarKey = booleanPreferencesKey("floating_nav_bar")
 
     suspend fun validateKey(key: String): Boolean {
         return apiService.validateKey(key)
@@ -63,5 +64,11 @@ class AuthRepository(
 
     suspend fun setHideDividers(enabled: Boolean) {
         dataStore.edit { it[hideDividersKey] = enabled }
+    }
+
+    val isFloatingNavBar: Flow<Boolean> = dataStore.data.map { it[floatingNavBarKey] ?: true }
+
+    suspend fun setFloatingNavBar(enabled: Boolean) {
+        dataStore.edit { it[floatingNavBarKey] = enabled }
     }
 }
