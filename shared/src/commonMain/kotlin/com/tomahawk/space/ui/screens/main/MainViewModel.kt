@@ -34,10 +34,10 @@ class MainViewModel(
     val state: StateFlow<MainState> = _state.asStateFlow()
 
     val searchByDate: StateFlow<Boolean> = authRepository.searchByDate
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val highResImages: StateFlow<Boolean> = authRepository.highResImages
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isCurrentLiked: StateFlow<Boolean> = combine(_state, galleryRepository.likedApods) { state, likedList ->
         if (state is MainState.Success) {
@@ -45,7 +45,7 @@ class MainViewModel(
         } else {
             false
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), initialValue = false)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
     fun loadApod(dateMillis: Long? = null) {
         viewModelScope.launch {

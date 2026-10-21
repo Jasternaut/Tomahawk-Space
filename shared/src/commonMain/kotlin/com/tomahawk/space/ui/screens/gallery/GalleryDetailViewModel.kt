@@ -24,10 +24,10 @@ class GalleryDetailViewModel(
 
     val apod: StateFlow<ApodResponse?> = galleryRepository.likedApods.map { list ->
         list.find { it.date == date }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val highResImages: StateFlow<Boolean> = authRepository.highResImages
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     var isRefreshing by mutableStateOf(false)
         private set

@@ -43,22 +43,22 @@ class SettingsViewModel(private val repository: AuthRepository) : ViewModel() {
         private set
 
     val searchByDate: StateFlow<Boolean> = repository.searchByDate
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val highResImages: StateFlow<Boolean> = repository.highResImages
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val appTheme: StateFlow<Int> = repository.appTheme
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+        .stateIn(viewModelScope, SharingStarted.Lazily, 0)
 
     val dynamicColors: StateFlow<Boolean> = repository.dynamicColors
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+        .stateIn(viewModelScope, SharingStarted.Lazily, true)
 
     val hideDividers: StateFlow<Boolean> = repository.hideDividers
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     val isFloatingNavBar: StateFlow<Boolean> = repository.isFloatingNavBar
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+        .stateIn(viewModelScope, SharingStarted.Lazily, true)
 
     init {
         loadKey()

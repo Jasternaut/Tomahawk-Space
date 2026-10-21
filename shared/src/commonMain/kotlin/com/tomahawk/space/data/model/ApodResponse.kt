@@ -10,5 +10,6 @@ data class ApodResponse(
     @SerialName("hdurl") val hdUrl: String? = null,
     @SerialName("date") val date: String = "",
     @SerialName("explanation") val explanation: String = "",
-    @SerialName("media_type") val mediaType: String = ""
+    @SerialName("media_type") val mediaType: String = "",
+    @SerialName("basic_html") val basicHtml: String = ""
 )

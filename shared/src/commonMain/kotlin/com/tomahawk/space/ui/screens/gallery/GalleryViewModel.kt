@@ -30,7 +30,7 @@ class GalleryViewModel(
             SortOrder.Newest -> list.sortedByDescending { it.date }
             SortOrder.Oldest -> list.sortedBy { it.date }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun toggleSortOrder() {
         _sortOrder.value = if (_sortOrder.value is SortOrder.Newest) {

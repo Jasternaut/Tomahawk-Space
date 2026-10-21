@@ -2,30 +2,35 @@ package com.tomahawk.space.ui.navigation
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -34,6 +39,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -50,9 +57,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -60,6 +71,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.tomahawk.space.getPlatform
 import com.tomahawk.space.data.ApodRepository
 import com.tomahawk.space.data.AuthRepository
 import com.tomahawk.space.data.GalleryRepository
@@ -81,11 +93,26 @@ import tomahawkspace.shared.generated.resources.Res
 import tomahawkspace.shared.generated.resources.nav_gallery
 import tomahawkspace.shared.generated.resources.nav_general
 import tomahawkspace.shared.generated.resources.nav_settings
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 sealed class Screen(val route: String, val labelRes: StringResource, val icon: ImageVector) {
     object General : Screen("general", Res.string.nav_general, Icons.Default.Home)
     object Gallery : Screen("gallery", Res.string.nav_gallery, Icons.Default.Menu)
     object Settings : Screen("settings", Res.string.nav_settings, Icons.Default.Settings)
+}
+
+fun getRouteOrder(route: String?): Int {
+    if (route == null) return 0
+    return when {
+        route == Screen.General.route -> 10
+        route == Screen.Gallery.route -> 20
+        route.startsWith("gallery_detail") -> 25
+        route == Screen.Settings.route -> 30
+        route == "settings_general" -> 31
+        route == "settings_api" -> 32
+        else -> 0
+    }
 }
 
 @Composable
@@ -139,6 +166,7 @@ fun MainAppNavigation(
 ) {
     val navController = rememberNavController()
     val isFloatingNavBar by authRepository.isFloatingNavBar.collectAsState(initial = true)
+    val isDesktop = remember { getPlatform().name.contains("Java") }
 
     val items = listOf(
         Screen.General,
@@ -155,6 +183,7 @@ fun MainAppNavigation(
 
     TomahawkMainScaffold(
         isFloatingNavBar = isFloatingNavBar,
+        isDesktop = isDesktop,
         showNavBar = showNavBar,
         currentScreen = currentScreen,
         items = items,
@@ -173,116 +202,72 @@ fun MainAppNavigation(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest)
         ) {
+            val slideSpec = tween<IntOffset>(durationMillis = 320, easing = FastOutSlowInEasing)
+
             NavHost(
                 navController = navController,
                 startDestination = Screen.General.route,
                 enterTransition = {
-                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
-                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+                    val initialOrder = getRouteOrder(initialState.destination.route)
+                    val targetOrder = getRouteOrder(targetState.destination.route)
 
-                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
-                        if (targetIndex > initialIndex) {
-                            slideInHorizontally(
-                                initialOffsetX = { fullWidth -> fullWidth },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        } else {
-                            slideInHorizontally(
-                                initialOffsetX = { fullWidth -> -fullWidth },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        }
-                    } else {
+                    if (targetOrder >= initialOrder) {
                         slideInHorizontally(
                             initialOffsetX = { fullWidth -> fullWidth },
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            animationSpec = slideSpec
+                        )
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -fullWidth },
+                            animationSpec = slideSpec
                         )
                     }
                 },
                 exitTransition = {
-                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
-                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+                    val initialOrder = getRouteOrder(initialState.destination.route)
+                    val targetOrder = getRouteOrder(targetState.destination.route)
 
-                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
-                        if (targetIndex > initialIndex) {
-                            scaleOut(
-                                targetScale = 0.88f,
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            ) + slideOutHorizontally(
-                                targetOffsetX = { fullWidth -> -fullWidth / 6 },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        } else {
-                            scaleOut(
-                                targetScale = 0.88f,
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            ) + slideOutHorizontally(
-                                targetOffsetX = { fullWidth -> fullWidth / 6 },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        }
+                    if (targetOrder >= initialOrder) {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -fullWidth },
+                            animationSpec = slideSpec
+                        )
                     } else {
-                        scaleOut(
-                            targetScale = 0.88f,
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                        ) + slideOutHorizontally(
-                            targetOffsetX = { fullWidth -> -fullWidth / 6 },
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = slideSpec
                         )
                     }
                 },
                 popEnterTransition = {
-                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
-                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+                    val initialOrder = getRouteOrder(initialState.destination.route)
+                    val targetOrder = getRouteOrder(targetState.destination.route)
 
-                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
-                        if (targetIndex > initialIndex) {
-                            scaleIn(
-                                initialScale = 0.88f,
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            ) + slideInHorizontally(
-                                initialOffsetX = { fullWidth -> fullWidth / 6 },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        } else {
-                            scaleIn(
-                                initialScale = 0.88f,
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            ) + slideInHorizontally(
-                                initialOffsetX = { fullWidth -> -fullWidth / 6 },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        }
+                    if (targetOrder >= initialOrder) {
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> fullWidth },
+                            animationSpec = slideSpec
+                        )
                     } else {
-                        scaleIn(
-                            initialScale = 0.88f,
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                        ) + slideInHorizontally(
-                            initialOffsetX = { fullWidth -> -fullWidth / 6 },
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth -> -fullWidth },
+                            animationSpec = slideSpec
                         )
                     }
                 },
                 popExitTransition = {
-                    val initialIndex = items.indexOfFirst { it.route == initialState.destination.route }
-                    val targetIndex = items.indexOfFirst { it.route == targetState.destination.route }
+                    val initialOrder = getRouteOrder(initialState.destination.route)
+                    val targetOrder = getRouteOrder(targetState.destination.route)
 
-                    if (initialIndex != -1 && targetIndex != -1 && initialIndex != targetIndex) {
-                        if (targetIndex > initialIndex) {
-                            slideOutHorizontally(
-                                targetOffsetX = { fullWidth -> -fullWidth },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        } else {
-                            slideOutHorizontally(
-                                targetOffsetX = { fullWidth -> fullWidth },
-                                animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
-                            )
-                        }
+                    if (targetOrder >= initialOrder) {
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth -> -fullWidth },
+                            animationSpec = slideSpec
+                        )
                     } else {
                         slideOutHorizontally(
                             targetOffsetX = { fullWidth -> fullWidth },
-                            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing)
+                            animationSpec = slideSpec
                         )
                     }
                 }
@@ -372,6 +357,7 @@ fun MainAppNavigation(
 @Composable
 fun TomahawkMainScaffold(
     isFloatingNavBar: Boolean,
+    isDesktop: Boolean,
     showNavBar: Boolean,
     currentScreen: Screen,
     items: List<Screen>,
@@ -385,7 +371,7 @@ fun TomahawkMainScaffold(
     ) {
         Scaffold(
             bottomBar = {
-                if (showNavBar && !isFloatingNavBar) {
+                if (showNavBar && !isFloatingNavBar && !isDesktop) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ) {
@@ -401,19 +387,48 @@ fun TomahawkMainScaffold(
                 }
             }
         ) { innerPadding ->
-            val contentPadding = if (showNavBar && isFloatingNavBar) {
-                PaddingValues(
-                    top = innerPadding.calculateTopPadding(),
-                    bottom = 104.dp
-                )
-            } else {
-                innerPadding
+            val contentPadding = when {
+                showNavBar && isDesktop -> {
+                    PaddingValues(
+                        start = 88.dp,
+                        top = innerPadding.calculateTopPadding(),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
+                }
+                showNavBar && isFloatingNavBar -> {
+                    PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 104.dp
+                    )
+                }
+                else -> {
+                    innerPadding
+                }
             }
 
             content(contentPadding)
         }
 
-        if (showNavBar && isFloatingNavBar) {
+        if (showNavBar && isDesktop) {
+            NavigationRail(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxHeight()
+            ) {
+                Spacer(Modifier.height(16.dp))
+                items.forEach { screen ->
+                    val isSelected = currentScreen == screen
+                    NavigationRailItem(
+                        selected = isSelected,
+                        onClick = { onScreenSelected(screen) },
+                        icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
+                        label = { Text(stringResource(screen.labelRes)) }
+                    )
+                }
+            }
+        } else if (showNavBar && isFloatingNavBar) {
             FloatingNavigationCapsule(
                 currentScreen = currentScreen,
                 items = items,
@@ -434,58 +449,209 @@ fun FloatingNavigationCapsule(
     onScreenSelected: (Screen) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var contentWidthPx by remember { mutableStateOf(0f) }
+
+    val selectedIndex = items.indexOf(currentScreen).coerceAtLeast(0)
+    val tabWidthPx = if (items.isNotEmpty() && contentWidthPx > 0f) contentWidthPx / items.size else 0f
+
+    var isPressed by remember { mutableStateOf(false) }
+    var isDragging by remember { mutableStateOf(false) }
+    var dragX by remember { mutableStateOf(0f) }
+    var dragVelocity by remember { mutableStateOf(0f) }
+
+    val targetCenterX = if (isDragging) {
+        dragX.coerceIn(tabWidthPx / 2f, contentWidthPx - tabWidthPx / 2f)
+    } else {
+        tabWidthPx * selectedIndex + tabWidthPx / 2f
+    }
+
+    val animatedPillCenterX by animateFloatAsState(
+        targetValue = targetCenterX,
+        animationSpec = if (isDragging) {
+            snap()
+        } else {
+            spring(stiffness = Spring.StiffnessMediumLow, dampingRatio = Spring.DampingRatioLowBouncy)
+        },
+        label = "pillCenterX"
+    )
+
+    val containerScale by animateFloatAsState(
+        targetValue = if (isPressed) 1.04f else 1.0f,
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow, dampingRatio = Spring.DampingRatioLowBouncy),
+        label = "containerScale"
+    )
+
+    val baseScale = 1.28f
+    val speedSensitivityThreshold = 5f
+    val speedFactor = (dragVelocity / speedSensitivityThreshold).coerceIn(0f, 1f)
+
+    val targetScaleY = if (isPressed) {
+        if (isDragging) {
+            baseScale - (baseScale - 0.98f) * speedFactor
+        } else {
+            baseScale
+        }
+    } else {
+        1.0f
+    }
+
+    val targetScaleX = if (isPressed) {
+        if (isDragging) {
+            baseScale + (1.40f - baseScale) * speedFactor
+        } else {
+            baseScale
+        }
+    } else {
+        1.0f
+    }
+
+    val pillScaleY by animateFloatAsState(
+        targetValue = targetScaleY,
+        animationSpec = spring(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy),
+        label = "pillScaleY"
+    )
+
+    val pillScaleX by animateFloatAsState(
+        targetValue = targetScaleX,
+        animationSpec = spring(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioLowBouncy),
+        label = "pillScaleX"
+    )
+
     Surface(
         modifier = modifier
+            .graphicsLayer {
+                scaleX = containerScale
+                scaleY = containerScale
+            }
             .height(68.dp)
             .fillMaxWidth(),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
-        tonalElevation = 6.dp,
-        shadowElevation = 12.dp,
+        tonalElevation = if (isPressed) 12.dp else 6.dp,
+        shadowElevation = if (isPressed) 18.dp else 12.dp,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 8.dp)
+                .onGloballyPositioned { layoutCoordinates ->
+                    contentWidthPx = layoutCoordinates.size.width.toFloat()
+                }
+                .pointerInput(items, contentWidthPx) {
+                    val slopPx = 10f
+                    awaitPointerEventScope {
+                        while (true) {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            isPressed = true
+                            isDragging = false
+                            dragVelocity = 0f
+
+                            val startTouchX = down.position.x
+                            dragX = startTouchX
+                            val pointerId = down.id
+                            var lastX = startTouchX
+
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                val dragChange = event.changes.firstOrNull { it.id == pointerId }
+
+                                if (dragChange == null || !dragChange.pressed) {
+                                    break
+                                }
+
+                                val currentX = dragChange.position.x
+                                val deltaX = currentX - lastX
+
+                                if (!isDragging && abs(currentX - startTouchX) > slopPx) {
+                                    isDragging = true
+                                }
+
+                                if (isDragging) {
+                                    dragX = currentX
+                                    dragVelocity = abs(deltaX)
+                                    dragChange.consume()
+                                }
+
+                                lastX = currentX
+                            }
+
+                            if (isDragging) {
+                                if (tabWidthPx > 0f) {
+                                    val releasedIndex = (dragX / tabWidthPx).toInt().coerceIn(0, items.size - 1)
+                                    onScreenSelected(items[releasedIndex])
+                                }
+                            }
+
+                            isPressed = false
+                            isDragging = false
+                            dragVelocity = 0f
+                        }
+                    }
+                },
+            contentAlignment = Alignment.CenterStart
         ) {
-            items.forEach { screen ->
-                val isSelected = currentScreen == screen
-                val pillColor = if (isSelected) {
-                    MaterialTheme.colorScheme.secondaryContainer
-                } else {
-                    Color.Transparent
-                }
-                val contentColor = if (isSelected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
+            // Liquid Droplet Slider Pill
+            if (tabWidthPx > 0f) {
+                val density = LocalDensity.current
+                val pillWidthDp = with(density) { tabWidthPx.toDp() }
+                val pillOffsetX = with(density) { (animatedPillCenterX - tabWidthPx / 2f).toDp() }
 
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .offset { IntOffset(with(density) { pillOffsetX.toPx() }.roundToInt(), 0) }
+                        .width(pillWidthDp)
                         .fillMaxHeight(0.82f)
+                        .graphicsLayer {
+                            scaleX = pillScaleX
+                            scaleY = pillScaleY
+                        }
                         .clip(CircleShape)
-                        .background(pillColor)
-                        .clickable { onScreenSelected(screen) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = screen.icon,
-                            contentDescription = stringResource(screen.labelRes),
-                            tint = contentColor,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Spacer(Modifier.height(2.dp))
-                        Text(
-                            text = stringResource(screen.labelRes),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = contentColor
-                        )
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                )
+            }
+
+            // Tab icons & text labels
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items.forEach { screen ->
+                    val isSelected = currentScreen == screen
+                    val contentColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(0.82f)
+                            .clip(CircleShape)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                onScreenSelected(screen)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = screen.icon,
+                                contentDescription = stringResource(screen.labelRes),
+                                tint = contentColor,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Text(
+                                text = stringResource(screen.labelRes),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = contentColor
+                            )
+                        }
                     }
                 }
             }
@@ -497,22 +663,8 @@ fun FloatingNavigationCapsule(
 private fun AnimatedContentScope.AnimatedCardWrapper(
     content: @Composable () -> Unit
 ) {
-    val isAnimating = transition.isRunning
-    val targetRadius = if (isAnimating) 20.dp else 0.dp
-
-    val animatedRadius by animateDpAsState(
-        targetValue = targetRadius,
-        animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
-        label = "cardCornerAnimation"
-    )
-
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .graphicsLayer {
-                shape = RoundedCornerShape(animatedRadius)
-                clip = true
-            },
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         content()

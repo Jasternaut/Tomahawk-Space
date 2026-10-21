@@ -6,14 +6,14 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.tomahawk.space.createDataStore
+import com.tomahawk.space.getDataStore
 import com.tomahawk.space.data.remote.NasaApiService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class AuthRepository(
-    private val dataStore: DataStore<Preferences> = createDataStore("auth_prefs"),
+    private val dataStore: DataStore<Preferences> = getDataStore("auth_prefs"),
     private val apiService: NasaApiService = NasaApiService()
 ) {
     private val apiKey = stringPreferencesKey("api_key")
@@ -25,6 +25,7 @@ class AuthRepository(
     private val floatingNavBarKey = booleanPreferencesKey("floating_nav_bar")
 
     suspend fun validateKey(key: String): Boolean {
+        if (key.isBlank() || key == "DEMO_KEY") return true
         return apiService.validateKey(key)
     }
 
@@ -33,7 +34,8 @@ class AuthRepository(
     }
 
     suspend fun getKey(): String? {
-        return dataStore.data.map { it[apiKey] }.first()
+        val saved = dataStore.data.map { it[apiKey] }.first()
+        return if (saved.isNullOrBlank()) "DEMO_KEY" else saved
     }
 
     val searchByDate: Flow<Boolean> = dataStore.data.map { it[searchByDateKey] ?: false }
