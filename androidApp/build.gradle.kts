@@ -14,7 +14,7 @@ kotlin {
 dependencies {
     implementation(project(":shared"))
 
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.material)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.splashscreen)
 

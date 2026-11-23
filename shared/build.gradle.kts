@@ -8,6 +8,10 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
+compose.resources {
+    publicResClass = true
+}
+
 kotlin {
     jvm()
     
