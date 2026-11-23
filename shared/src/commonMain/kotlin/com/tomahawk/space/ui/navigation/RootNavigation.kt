@@ -364,58 +364,15 @@ fun TomahawkMainScaffold(
     onScreenSelected: (Screen) -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        Scaffold(
-            bottomBar = {
-                if (showNavBar && !isFloatingNavBar && !isDesktop) {
-                    NavigationBar(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ) {
-                        items.forEach { screen ->
-                            NavigationBarItem(
-                                selected = currentScreen == screen,
-                                onClick = { onScreenSelected(screen) },
-                                icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
-                                label = { Text(stringResource(screen.labelRes)) }
-                            )
-                        }
-                    }
-                }
-            }
-        ) { innerPadding ->
-            val contentPadding = when {
-                showNavBar && isDesktop -> {
-                    PaddingValues(
-                        start = 88.dp,
-                        top = innerPadding.calculateTopPadding(),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                        bottom = innerPadding.calculateBottomPadding()
-                    )
-                }
-                showNavBar && isFloatingNavBar -> {
-                    PaddingValues(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = 104.dp
-                    )
-                }
-                else -> {
-                    innerPadding
-                }
-            }
-
-            content(contentPadding)
-        }
-
         if (showNavBar && isDesktop) {
             NavigationRail(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxHeight()
             ) {
                 Spacer(Modifier.height(16.dp))
                 items.forEach { screen ->
@@ -428,16 +385,54 @@ fun TomahawkMainScaffold(
                     )
                 }
             }
-        } else if (showNavBar && isFloatingNavBar) {
-            FloatingNavigationCapsule(
-                currentScreen = currentScreen,
-                items = items,
-                onScreenSelected = onScreenSelected,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
-                    .navigationBarsPadding()
-            )
+        }
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        ) {
+            Scaffold(
+                bottomBar = {
+                    if (showNavBar && !isFloatingNavBar && !isDesktop) {
+                        NavigationBar(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        ) {
+                            items.forEach { screen ->
+                                NavigationBarItem(
+                                    selected = currentScreen == screen,
+                                    onClick = { onScreenSelected(screen) },
+                                    icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
+                                    label = { Text(stringResource(screen.labelRes)) }
+                                )
+                            }
+                        }
+                    }
+                }
+            ) { innerPadding ->
+                val contentPadding = if (showNavBar && !isDesktop && isFloatingNavBar) {
+                    PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = 104.dp
+                    )
+                } else {
+                    innerPadding
+                }
+
+                content(contentPadding)
+            }
+
+            if (showNavBar && !isDesktop && isFloatingNavBar) {
+                FloatingNavigationCapsule(
+                    currentScreen = currentScreen,
+                    items = items,
+                    onScreenSelected = onScreenSelected,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 24.dp, vertical = 20.dp)
+                        .navigationBarsPadding()
+                )
+            }
         }
     }
 }
@@ -580,6 +575,12 @@ fun FloatingNavigationCapsule(
                                 if (tabWidthPx > 0f) {
                                     val releasedIndex = (dragX / tabWidthPx).toInt().coerceIn(0, items.size - 1)
                                     onScreenSelected(items[releasedIndex])
+                                }
+                            } else {
+                                // Simple tap/click (no drag) — navigate to the tapped tab
+                                if (tabWidthPx > 0f) {
+                                    val tappedIndex = (startTouchX / tabWidthPx).toInt().coerceIn(0, items.size - 1)
+                                    onScreenSelected(items[tappedIndex])
                                 }
                             }
 
