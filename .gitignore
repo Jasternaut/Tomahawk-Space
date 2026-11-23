@@ -49,3 +49,5 @@ captures/
 proguard/
 .artifacts/
 app/release/
+/androidApp/release/androidApp-release.apk
+/androidApp/release/output-metadata.json
