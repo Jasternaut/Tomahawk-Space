@@ -40,6 +40,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(compose.uiTooling)
+            implementation(libs.coil.network.ktor)
+        }
+        jvmMain.dependencies {
+            implementation(libs.coil.network.ktor)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -59,7 +63,6 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.coil.compose)
-            implementation(libs.coil.network.ktor)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
