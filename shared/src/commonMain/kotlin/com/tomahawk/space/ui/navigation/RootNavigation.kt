@@ -19,29 +19,34 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -377,21 +382,11 @@ fun TomahawkMainScaffold(
             .background(MaterialTheme.colorScheme.background)
     ) {
         if (showNavBar && isDesktop) {
-            NavigationRail(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                Spacer(Modifier.height(16.dp))
-                items.forEach { screen ->
-                    val isSelected = currentScreen == screen
-                    NavigationRailItem(
-                        selected = isSelected,
-                        onClick = { onScreenSelected(screen) },
-                        icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
-                        label = { Text(stringResource(screen.labelRes)) }
-                    )
-                }
-            }
+            DesktopSideNavigation(
+                items = items,
+                currentScreen = currentScreen,
+                onScreenSelected = onScreenSelected
+            )
         }
 
         Box(
@@ -574,6 +569,175 @@ private fun FloatingDockItem(
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1
             )
+        }
+    }
+}
+
+@Composable
+fun DesktopSideNavigation(
+    items: List<Screen>,
+    currentScreen: Screen,
+    onScreenSelected: (Screen) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    val sidebarWidth by animateDpAsState(
+        targetValue = if (isExpanded) 220.dp else 72.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            dampingRatio = Spring.DampingRatioLowBouncy
+        ),
+        label = "sidebarWidth"
+    )
+
+    Surface(
+        modifier = modifier
+            .width(sidebarWidth)
+            .fillMaxHeight(),
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        tonalElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 12.dp, vertical = 12.dp),
+            horizontalAlignment = if (isExpanded) Alignment.Start else Alignment.CenterHorizontally
+        ) {
+            IconButton(
+                onClick = { isExpanded = !isExpanded },
+                modifier = Modifier
+                    .padding(bottom = 12.dp)
+                    .size(40.dp)
+            ) {
+                Icon(
+                    imageVector = if (isExpanded) Icons.AutoMirrored.Filled.MenuOpen else Icons.Default.Menu,
+                    contentDescription = "Toggle Sidebar",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = if (isExpanded) Alignment.Start else Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                items.forEach { screen ->
+                    val isSelected = currentScreen == screen
+                    DesktopNavItem(
+                        screen = screen,
+                        isSelected = isSelected,
+                        isExpanded = isExpanded,
+                        onClick = { onScreenSelected(screen) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DesktopNavItem(
+    screen: Screen,
+    isSelected: Boolean,
+    isExpanded: Boolean,
+    onClick: () -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.94f else 1.0f,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessMediumLow,
+            dampingRatio = Spring.DampingRatioLowBouncy
+        ),
+        label = "desktopItemScale"
+    )
+
+    val containerColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.surfaceContainerHigh
+        } else {
+            Color.Transparent
+        },
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        label = "desktopItemContainerColor"
+    )
+
+    val contentColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        label = "desktopItemContentColor"
+    )
+
+    Surface(
+        modifier = (if (isExpanded) Modifier.fillMaxWidth().height(48.dp) else Modifier.size(48.dp))
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(14.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            ),
+        shape = RoundedCornerShape(14.dp),
+        color = containerColor
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(20.dp)
+                    .align(Alignment.CenterStart)
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                    )
+            )
+
+            if (isExpanded) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 16.dp, end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = screen.icon,
+                        contentDescription = stringResource(screen.labelRes),
+                        tint = contentColor,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(Modifier.width(14.dp))
+                    Text(
+                        text = stringResource(screen.labelRes),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                        color = contentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = screen.icon,
+                        contentDescription = stringResource(screen.labelRes),
+                        tint = contentColor,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+            }
         }
     }
 }
