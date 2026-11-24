@@ -30,8 +30,8 @@ android {
         applicationId = "com.tomahawk.space"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = libs.versions.app.versionCode.get().toInt()
+        versionName = libs.versions.app.version.get()
     }
     packaging {
         resources {
