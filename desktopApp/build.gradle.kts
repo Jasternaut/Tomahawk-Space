@@ -28,7 +28,7 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
 
             packageName = "Tomahawk Space"
-            packageVersion = "1.0.0"
+            packageVersion = libs.versions.app.version.get()
             description = "NASA Astronomy Picture of the Day explorer"
             copyright = "© 2024 Tomahawk. All rights reserved."
             vendor = "Tomahawk"

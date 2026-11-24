@@ -100,11 +100,13 @@ fun GeneralSettingsScreen(
             )
         }
     ) { padding ->
+        val floatingInset = com.tomahawk.space.ui.navigation.LocalFloatingNavInset.current
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + floatingInset),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { Spacer(modifier = Modifier.height(4.dp)) }
@@ -132,21 +134,25 @@ fun GeneralSettingsScreen(
 
             // System & Navigation Settings Section
             item {
+                val isDesktop = remember { com.tomahawk.space.getPlatform().name.contains("Java") }
+
                 SettingsSection(title = stringResource(Res.string.settings_system_header)) {
                     SettingsGroup {
-                        SettingsSwitchItem(
-                            title = stringResource(Res.string.settings_floating_nav_bar),
-                            description = stringResource(Res.string.settings_floating_nav_bar_desc),
-                            icon = Icons.Default.Navigation,
-                            checked = isFloatingNavBar,
-                            onCheckedChange = { viewModel.toggleFloatingNavBar(it) }
-                        )
-                        if (!hideDividers) {
-                            HorizontalDivider(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                thickness = 0.5.dp,
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                        if (!isDesktop) {
+                            SettingsSwitchItem(
+                                title = stringResource(Res.string.settings_floating_nav_bar),
+                                description = stringResource(Res.string.settings_floating_nav_bar_desc),
+                                icon = Icons.Default.Navigation,
+                                checked = isFloatingNavBar,
+                                onCheckedChange = { viewModel.toggleFloatingNavBar(it) }
                             )
+                            if (!hideDividers) {
+                                HorizontalDivider(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    thickness = 0.5.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                                )
+                            }
                         }
                         SettingsSwitchItem(
                             title = stringResource(Res.string.settings_dynamic_colors),
