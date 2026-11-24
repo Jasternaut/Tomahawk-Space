@@ -1,42 +1,72 @@
 # Tomahawk Space
 
-**Tomahawk Space** is a modern Android application designed for space enthusiasts to explore the wonders of the universe. It leverages NASA's APIs to bring breathtaking space imagery and information directly to your fingertips
+**Tomahawk Space** is a modern, cross-platform space exploration application built with **Kotlin Multiplatform (KMP)** and **Compose Multiplatform** for **Android** and **Desktop (Windows, macOS, Linux)**. It leverages NASA's APIs to bring breathtaking space imagery, astronomical details, and celestial discoveries directly to your device.
 
-## Features
+---
 
-- **Astronomy Picture of the Day (APOD):** Discover a new celestial image or video every day, accompanied by professional explanations
-- **Space Gallery:** Browse through a curated collection of high-quality space exploration photos
-- **Secure Authentication:** Easy setup with your own NASA API key, securely stored using Android DataStore
-- **Modern UI/UX:** Built entirely with Jetpack Compose and Material 3, featuring:
-    - **Edge-to-Edge Experience:** Fully immersive interface that flows behind system bars
-    - **Dynamic Dark Mode:** Seamlessly adapts to your system theme
-    - **Fluid Animations:** Custom animated splash screen and smooth transitions
-- **Modern Tech Stack:** Utilizes the latest Android development practices and libraries
+## 🚀 Features
 
-## Technology Stack
+- **Astronomy Picture of the Day (APOD):** Discover daily celestial images or videos, accompanied by official explanations, high-resolution options, and date search.
+- **Space Gallery:** Save favorite space photos to a local gallery with custom sorting (newest/oldest) and detailed views.
+- **Adaptive Platform Navigation:**
+  - **Mobile (Android):** Floating Navigation Dock with smooth active tab expansion and spring press feedback (toggleable to standard M3 Navigation Bar).
+  - **Desktop (PC):** Collapsible side navigation drawer featuring square-shaped buttons with centered icons when collapsed, and expanded labeled menu items.
+- **Secure Authentication & Preferences:** Seamless onboarding with NASA API key management (`DEMO_KEY` out of the box or custom key), securely stored via cross-platform DataStore.
+- **Customizable Appearance:** Full support for Light, Dark, System, and Pure Black (AMOLED) modes, dynamic color schemes, and UI divider options.
+
+---
+
+## 🛠️ Technology Stack
 
 - **Language:** [Kotlin](https://kotlinlang.org/)
-- **UI Framework:** [Jetpack Compose](https://developer.android.com/jetpack/compose) (Material 3)
-- **Networking:** [Retrofit](https://square.github.io/retrofit/) & [OkHttp](https://square.github.io/okhttp/)
-- **Image Loading:** [Coil](https://coil-kt.github.io/coil/)
-- **Navigation:** [Navigation Compose](https://developer.android.com/jetpack/compose/navigation)
-- **Data Persistence:** [Jetpack DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (Preferences)
-- **Dependency Management:** Version Catalogs (libs.versions.toml)
+- **Cross-Platform Engine:** Kotlin Multiplatform (KMP) & [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)
+- **UI Framework:** Material 3 (Compose Multiplatform)
+- **Networking:** [Ktor Client](https://ktor.io/) (Ktor CIO Engine, Content Negotiation, `kotlinx.serialization`)
+- **Image Loading:** [Coil 3](https://coil-kt.github.io/coil/) (Coil Multiplatform Compose + Ktor 3 network fetcher)
+- **Navigation:** [Jetpack Navigation Compose Multiplatform](https://developer.android.com/jetpack/compose/navigation)
+- **Data Persistence:** [Jetpack DataStore Preferences](https://developer.android.com/topic/libraries/architecture/datastore) (Multiplatform)
+- **Asynchronous & Reactive:** Kotlin Coroutines & StateFlow
+- **Dependency Management:** Gradle Version Catalogs (`gradle/libs.versions.toml`)
 
-## Getting Started
+---
+
+## 📁 Project Structure
+
+```text
+Tomahawk-Space/
+├── shared/              # Core KMP module (UI, ViewModels, Repositories, Ktor API Service, DataStore)
+│   ├── commonMain/      # Shared Compose UI screens, navigation, domain logic & resources
+│   ├── androidMain/     # Android platform-specific implementations
+│   └── jvmMain/         # Desktop JVM platform-specific implementations
+├── androidApp/          # Android application entry point & Manifest
+└── desktopApp/          # Desktop JVM application entry point (Windows/macOS/Linux)
+```
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
 
-- **Android Studio**
+- **Android Studio** (Ladybug / 2024.2.1+ or newer)
 - **JDK 17+**
-- **Android SDK 35+** (Target SDK 37)
-- **NASA API Key:** You can get a free key from [api.nasa.gov](https://api.nasa.gov/).
+- **Android SDK 37** (Compile/Target: 37, Min SDK: 24)
+- **NASA API Key:** Optional (uses `DEMO_KEY` by default). Free keys available at [api.nasa.gov](https://api.nasa.gov/).
 
-### Installation
+### Installation & Running
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/yourusername/tomahawk-space.git
-2. Open the project in Android Studio
-3. Let Gradle sync and download dependencies
-4. Build and run the app on an emulator or physical device (Min SDK 26)
+   cd tomahawk-space
+   ```
+
+2. **Open in Android Studio:**
+   - Open the cloned project folder and allow Gradle to sync dependencies.
+
+3. **Run the Application:**
+   - **Android:** Select the `androidApp` run configuration and run on an emulator or physical device.
+   - **Desktop (PC):** Select the `desktopApp` run configuration or execute from terminal:
+     ```bash
+     ./gradlew :desktopApp:run
+     ```
