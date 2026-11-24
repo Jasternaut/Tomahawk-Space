@@ -100,11 +100,13 @@ fun GeneralSettingsScreen(
             )
         }
     ) { padding ->
+        val floatingInset = com.tomahawk.space.ui.navigation.LocalFloatingNavInset.current
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + floatingInset),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { Spacer(modifier = Modifier.height(4.dp)) }

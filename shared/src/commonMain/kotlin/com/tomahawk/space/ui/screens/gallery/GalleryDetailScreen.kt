@@ -96,13 +96,14 @@ fun GalleryDetailScreen(
             )
         }
     ) { innerPadding ->
+        val floatingInset = com.tomahawk.space.ui.navigation.LocalFloatingNavInset.current
         apod?.let { item ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + floatingInset),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(

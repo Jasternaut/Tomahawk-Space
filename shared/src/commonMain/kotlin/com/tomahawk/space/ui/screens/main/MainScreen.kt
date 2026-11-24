@@ -108,6 +108,7 @@ fun MainScreen(
     }
 
     val geologica = getGeologicaFontFamily()
+    val floatingInset = com.tomahawk.space.ui.navigation.LocalFloatingNavInset.current
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -115,7 +116,7 @@ fun MainScreen(
             start = 16.dp,
             end = 16.dp,
             top = contentPadding.calculateTopPadding() + 12.dp,
-            bottom = contentPadding.calculateBottomPadding() + 16.dp
+            bottom = maxOf(contentPadding.calculateBottomPadding(), floatingInset) + 16.dp
         ),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

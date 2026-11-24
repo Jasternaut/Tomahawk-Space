@@ -80,6 +80,8 @@ fun GalleryScreen(
             )
         }
     ) { innerPadding ->
+        val floatingInset = com.tomahawk.space.ui.navigation.LocalFloatingNavInset.current
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -89,7 +91,7 @@ fun GalleryScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(32.dp),
+                        .padding(start = 32.dp, top = 32.dp, end = 32.dp, bottom = 32.dp + floatingInset),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -110,7 +112,12 @@ fun GalleryScreen(
             } else {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(minSize = 160.dp),
-                    contentPadding = PaddingValues(16.dp),
+                    contentPadding = PaddingValues(
+                        start = 16.dp,
+                        top = 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp + floatingInset
+                    ),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxSize()
