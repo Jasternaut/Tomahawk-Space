@@ -73,4 +73,7 @@
     <string name="resolution_standard">Standard Resolution</string>
     <string name="resolution_high">High Resolution</string>
     <string name="gallery_refresh_metadata">Check for HD quality</string>
+    <string name="image_fullscreen_open">Open in full screen</string>
+    <string name="image_fullscreen_close">Close full screen view</string>
+    <string name="image_reset_zoom">Reset zoom</string>
 </resources>

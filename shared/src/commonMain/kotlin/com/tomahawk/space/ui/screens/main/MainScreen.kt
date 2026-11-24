@@ -1,6 +1,7 @@
 package com.tomahawk.space.ui.screens.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
@@ -29,9 +31,12 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import com.tomahawk.space.ui.components.ZoomableImageViewerDialog
+import tomahawkspace.shared.generated.resources.image_fullscreen_open
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +85,16 @@ fun MainScreen(
     val highResImages by viewModel.highResImages.collectAsState()
 
     var showDatePicker by remember { mutableStateOf(false) }
+    var fullscreenImageUrl by remember { mutableStateOf<String?>(null) }
+
+    fullscreenImageUrl?.let { url ->
+        val currentTitle = (state as? MainState.Success)?.apod?.title ?: ""
+        ZoomableImageViewerDialog(
+            imageUrl = url,
+            title = currentTitle,
+            onDismiss = { fullscreenImageUrl = null }
+        )
+    }
 
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState()
@@ -272,9 +287,30 @@ fun MainScreen(
                                     contentDescription = apod.title,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .clip(RoundedCornerShape(28.dp)),
+                                        .clip(RoundedCornerShape(28.dp))
+                                        .clickable { fullscreenImageUrl = imageUrl },
                                     contentScale = ContentScale.Crop
                                 )
+
+                                // Fullscreen zoom button overlay
+                                FilledIconButton(
+                                    onClick = { fullscreenImageUrl = imageUrl },
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(12.dp)
+                                        .size(40.dp),
+                                    shape = CircleShape,
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                        contentColor = MaterialTheme.colorScheme.onSurface
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.OpenInFull,
+                                        contentDescription = stringResource(Res.string.image_fullscreen_open),
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             } else {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),

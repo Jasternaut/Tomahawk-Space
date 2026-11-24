@@ -73,4 +73,7 @@
     <string name="resolution_standard">Обычное разрешение</string>
     <string name="resolution_high">Высокое разрешение</string>
     <string name="gallery_refresh_metadata">Проверить HD качество</string>
+    <string name="image_fullscreen_open">Открыть на весь экран</string>
+    <string name="image_fullscreen_close">Закрыть полноэкранный режим</string>
+    <string name="image_reset_zoom">Сбросить масштаб</string>
 </resources>
